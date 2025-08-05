@@ -1,3 +1,9 @@
+[![Build & Test](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/build.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/build.yml)
+[![Build & Release](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/release.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/release.yml)
+[![Build & Nuget Publish](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/nuget.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/nuget.yml)
+[![Release](https://img.shields.io/github/v/release/elminalirzayev/Easy.Notifications)](https://github.com/elminalirzayev/Easy.Notifications/releases)
+[![License](https://img.shields.io/github/license/elminalirzayev/Easy.Notifications)](https://github.com/elminalirzayev/Easy.Notifications/blob/master/LICENSE.txt)
+
 # Easy.Notifications
 
 **Easy.Notifications** is a modular and extensible .NET library for sending notifications through multiple channels. It provides a unified interface to dispatch messages via Email, SMS, WhatsApp, Telegram, Slack, Microsoft Teams, and more.
@@ -139,3 +145,7 @@ app.UseEndpoints(endpoints =>
 ## License
 
 MIT License.
+
+---
+
+© 2025 Elmin Alirzayev / Easy Code Tools
