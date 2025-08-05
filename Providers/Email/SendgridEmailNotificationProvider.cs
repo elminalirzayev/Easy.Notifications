@@ -42,16 +42,16 @@ namespace Easy.Notifications.Providers.Email
 
                     if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
                     {
-                        _logger.LogInformation("SendGrid: E-posta gönderildi -> {To}", toEmail);
+                        _logger.LogInformation("SendGrid: Email sent -> {To}", toEmail);
                     }
                     else
                     {
-                        _logger.LogWarning("SendGrid: Gönderim başarısız ({StatusCode}) -> {To}", response.StatusCode, toEmail);
+                        _logger.LogWarning("SendGrid: Sending failed ({StatusCode}) -> {To}", response.StatusCode, toEmail);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "SendGrid: E-posta gönderilemedi -> {To}", toEmail);
+                    _logger.LogError(ex, "SendGrid: Email could not be sent -> {To}", toEmail);
                 }
             }
         }

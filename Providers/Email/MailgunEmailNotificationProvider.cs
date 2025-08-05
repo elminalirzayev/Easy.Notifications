@@ -58,11 +58,11 @@ namespace Easy.Notifications.Providers.Email
 
                 if (!result.IsSuccessStatusCode)
                 {
-                    _logger.LogError("Mailgun: E-posta gönderilemedi -> {To}", toEmail);
+                    _logger.LogError("Mailgun: Email could not be sent -> {To}", toEmail);
                 }
                 else
                 {
-                    _logger.LogInformation("Mailgun: E-posta gönderildi -> {To}", toEmail);
+                    _logger.LogInformation("Mailgun: Email sent -> {To}", toEmail);
                 }
 
             }

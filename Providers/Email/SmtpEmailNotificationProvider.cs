@@ -46,11 +46,11 @@ namespace Easy.Notifications.Providers.Email
                 try
                 {
                     await smtp.SendMailAsync(mail);
-                    _logger.LogInformation("Email gönderildi: {To}", to);
+                    _logger.LogInformation("Email sent: {To}", to);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Email gönderilemedi: {To}", to);
+                    _logger.LogError(ex, "Email could not be sent: {To}", to);
                 }
             }
         }

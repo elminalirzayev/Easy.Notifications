@@ -3,8 +3,6 @@ using Easy.Notifications.Core.Interfaces;
 using Easy.Notifications.Core.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Providers.SignalR
 {

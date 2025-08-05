@@ -226,9 +226,8 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Telegram configuration section is missing.");
 
             if (string.IsNullOrWhiteSpace(config.BotToken) ||
-                config.ChatIds == null ||
-                !config.ChatIds.Any() ||
-               string.IsNullOrEmpty(config.ChatIds.First()))
+                config.ChatId == null ||
+               string.IsNullOrEmpty(config.ChatId))
                 throw new InvalidOperationException("Telegram configuration is incomplete. Required fields: BotToken, ChatId.");
         }
 

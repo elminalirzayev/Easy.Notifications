@@ -3,11 +3,6 @@ using Easy.Notifications.Core.Interfaces;
 using Easy.Notifications.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Providers.Telegram
 {
@@ -32,29 +27,29 @@ namespace Easy.Notifications.Providers.Telegram
 
         public async Task SendAsync(NotificationMessage message)
         {
-           
-                var url = $"https://api.telegram.org/bot{_config.BotToken}/sendMessage";
 
-                var content = new FormUrlEncodedContent(new[]
-                {
+            var url = $"https://api.telegram.org/bot{_config.BotToken}/sendMessage";
+
+            var content = new FormUrlEncodedContent(new[]
+            {
                 new KeyValuePair<string, string>("chat_id", _config.ChatId),
                 new KeyValuePair<string, string>("text", message.Body),
-                new KeyValuePair<string, string>("parse_mode", "HTML") // opsiyonel
+                new KeyValuePair<string, string>("parse_mode", "HTML") // optional
             });
 
-                try
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
+                if (!response.IsSuccessStatusCode)
                 {
-                    var response = await _httpClient.PostAsync(url, content);
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        _logger.LogError("Telegram mesajı gönderilemedi: {ChatId}", _config.ChatId);
-                    }
+                    _logger.LogError("Telegram message could not be sent: {ChatId}", _config.ChatId);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Telegram mesajı gönderilirken hata oluştu.");
-                }
-            
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while sending the Telegram message.");
+            }
+
         }
     }
 

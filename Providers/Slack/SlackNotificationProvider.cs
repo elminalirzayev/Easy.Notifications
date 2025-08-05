@@ -3,13 +3,8 @@ using Easy.Notifications.Core.Interfaces;
 using Easy.Notifications.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Providers.Slack
 {
@@ -34,7 +29,7 @@ namespace Easy.Notifications.Providers.Slack
 
         public async Task SendAsync(NotificationMessage message)
         {
-            // Eğer özel block varsa kullan, yoksa basit block oluştur
+            // If there is a custom block, use it; otherwise, create a simple block
             var payload = message.Metadata.TryGetValue("slackBlock", out var obj)
                 ? obj
                 : CreateDefaultBlockPayload(message);
@@ -47,13 +42,13 @@ namespace Easy.Notifications.Providers.Slack
                 var response = await _httpClient.PostAsync(_config.WebhookUrl, content);
 
                 if (!response.IsSuccessStatusCode)
-                    _logger.LogError("Slack mesajı gönderilemedi. Status: {StatusCode}", response.StatusCode);
+                    _logger.LogError("Slack message could not be sent. Status: {StatusCode}", response.StatusCode);
                 else
-                    _logger.LogInformation("Slack mesajı gönderildi.");
+                    _logger.LogInformation("Slack message sent.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Slack mesajı gönderilirken hata oluştu.");
+                _logger.LogError(ex, "An error occurred while sending the Slack message.");
             }
         }
 
@@ -77,7 +72,7 @@ namespace Easy.Notifications.Providers.Slack
                         type = "context",
                         elements = new object[]
                         {
-                            new { type = "mrkdwn", text = $"_Gönderim zamanı: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}_"}
+                            new { type = "mrkdwn", text = $"_Sent time: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}_"}
                         }
                     }
                 }

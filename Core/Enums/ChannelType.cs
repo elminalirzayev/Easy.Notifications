@@ -9,9 +9,9 @@
         Slack,
         Teams,
         SignalR,
-        //PushNotification,
-        //Firebase,
-        //discord,
+        //PushNotification, // Push notification
+        //Firebase, // Firebase
+        //discord, // Discord
 
         All
     }

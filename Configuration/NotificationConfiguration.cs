@@ -1,5 +1,7 @@
 ﻿using Easy.Notifications.Providers.Email;
+using Easy.Notifications.Providers.Slack;
 using Easy.Notifications.Providers.Sms;
+using Easy.Notifications.Providers.Teams;
 
 namespace Easy.Notifications.Configuration
 {
@@ -9,5 +11,7 @@ namespace Easy.Notifications.Configuration
         public NotificationProviders NotificationProviders { get; set; }
         public EmailConfiguration EmailConfiguration { get; set; }
         public SmsConfiguration SmsConfiguration { get; set; }
+        public SlackConfiguration SlackConfiguration { get; set; }
+        public TeamsConfiguration TeamsConfiguration { get; set; }
     }
 }
