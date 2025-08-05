@@ -17,7 +17,7 @@ namespace Easy.Notifications.Configuration
 {
     public static class NotificationBuilder
     {
-        public static IServiceCollection AddEasyNotify(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddEasyNotifications(this IServiceCollection services, IConfiguration configuration)
         {
             var section = configuration.GetSection("NotificationConfiguration");
             if (!section.Exists())
