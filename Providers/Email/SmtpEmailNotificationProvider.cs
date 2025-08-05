@@ -47,7 +47,7 @@ namespace Easy.Notifications.Providers.Email
             // Create and configure the SMTP client
             using var smtp = new SmtpClient(_settings.Host, _settings.Port)
             {
-                EnableSsl = _settings.EnableSsl,
+                EnableSsl = _settings.EnableSsl?? false,
                 Credentials = new NetworkCredential(_settings.Username, _settings.Password)
             };
 
