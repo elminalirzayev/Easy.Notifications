@@ -2,12 +2,15 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
+		<!--<TargetFrameworks>net9.0;net8.0;net7.0;net6.0;</TargetFrameworks>-->
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<LangVersion>10.0</LangVersion>
 
+		<Title>Easy.Easy.Notifications</Title>
 		<PackageId>Easy.Easy.Notifications</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
 		<Description>A modular and extensible .NET notification system that supports multiple channels like Email (SMTP, SendGrid, Mailgun), SMS (Twilio, Vonage), Telegram, Slack, Microsoft Teams, WhatsApp, and SignalR. Designed for easy configuration, scalability, and integration into modern applications.</Description>
@@ -16,6 +19,8 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+
 
 	</PropertyGroup>
 
@@ -31,6 +36,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="SendGrid" Version="9.29.3" />
 		<PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
 		<PackageReference Include="Twilio" Version="7.12.0" />
