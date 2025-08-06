@@ -5,9 +5,10 @@ on:
   push:
     tags:
       - 'v*.*.*'
+
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: windows-latest
@@ -37,26 +38,23 @@ jobs:
     - name: Run Tests (if any)
       run: dotnet test --no-restore --no-build --verbosity normal || true
 
-    # Publish: Self-contained
     - name: Publish Self-Contained
       run: dotnet publish -c Release -r win-x64 --self-contained true -o publish/self-contained
 
-    # Publish: Framework-dependent
     - name: Publish Framework-Dependent
       run: dotnet publish -c Release -r win-x64 --self-contained false -o publish/framework-dependent
 
-    # Zip both outputs
     - name: Archive builds
+      shell: pwsh
       run: |
-        Compress-Archive -Path publish/self-contained/* -DestinationPath $projName-self-contained.zip
-        Compress-Archive -Path publish/framework-dependent/* -DestinationPath $projName-framework-dependent.zip
+        Compress-Archive -Path publish/self-contained/* -DestinationPath "${env:PROJECT_NAME}-self-contained.zip"
+        Compress-Archive -Path publish/framework-dependent/* -DestinationPath "${env:PROJECT_NAME}-framework-dependent.zip"
 
-    # Create GitHub Release and upload zips
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          $projName-self-contained.zip
-          $projName-framework-dependent.zip
+          ${{ env.PROJECT_NAME }}-self-contained.zip
+          ${{ env.PROJECT_NAME }}-framework-dependent.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
