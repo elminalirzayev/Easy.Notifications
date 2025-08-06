@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<!--<TargetFrameworks>net9.0;net8.0;net7.0;net6.0;</TargetFrameworks>-->
+		<!--<TargetFrameworks>net9.0;net8.0;net7.0;net6.0; </TargetFrameworks>-->
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -10,7 +10,7 @@
 
 		<Title>Easy.Easy.Notifications</Title>
 		<PackageId>Easy.Easy.Notifications</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
 		<Description>A modular and extensible .NET notification system that supports multiple channels like Email (SMTP, SendGrid, Mailgun), SMS (Twilio, Vonage), Telegram, Slack, Microsoft Teams, WhatsApp, and SignalR. Designed for easy configuration, scalability, and integration into modern applications.</Description>
