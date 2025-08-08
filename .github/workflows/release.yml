@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build & Publish Multi-Target
 
 on:
   workflow_dispatch:
@@ -12,6 +12,9 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        framework: [net9.0, net8.0, net7.0, net6.0]
 
     steps:
     - name: Checkout source
@@ -20,14 +23,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'
-
-    - name: Extract project name
-      shell: pwsh
-      run: |
-        $projFile = Get-ChildItem -Recurse -Filter *.csproj | Select-Object -First 1
-        $projName = [System.IO.Path]::GetFileNameWithoutExtension($projFile.Name)
-        "PROJECT_NAME=$projName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        dotnet-version: '8.0.x' 
 
     - name: Restore dependencies
       run: dotnet restore
@@ -35,26 +31,41 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run Tests (if any)
-      run: dotnet test --no-restore --no-build --verbosity normal || true
-
     - name: Publish Self-Contained
-      run: dotnet publish -c Release -r win-x64 --self-contained true -o publish/self-contained
+      run: dotnet publish -c Release -r win-x64 -f ${{ matrix.framework }} --self-contained true -o publish/self-contained/${{ matrix.framework }}
 
     - name: Publish Framework-Dependent
-      run: dotnet publish -c Release -r win-x64 --self-contained false -o publish/framework-dependent
+      run: dotnet publish -c Release -r win-x64 -f ${{ matrix.framework }} --self-contained false -o publish/framework-dependent/${{ matrix.framework }}
 
     - name: Archive builds
       shell: pwsh
       run: |
-        Compress-Archive -Path publish/self-contained/* -DestinationPath "${env:PROJECT_NAME}-self-contained.zip"
-        Compress-Archive -Path publish/framework-dependent/* -DestinationPath "${env:PROJECT_NAME}-framework-dependent.zip"
+        Compress-Archive -Path "publish/self-contained/${{ matrix.framework }}/*" -DestinationPath "self-contained-${{ matrix.framework }}.zip"
+        Compress-Archive -Path "publish/framework-dependent/${{ matrix.framework }}/*" -DestinationPath "framework-dependent-${{ matrix.framework }}.zip"
 
-    - name: Create Release
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: builds-${{ matrix.framework }}
+        path: |
+          self-contained-${{ matrix.framework }}.zip
+          framework-dependent-${{ matrix.framework }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Display downloaded files (debug)
+      run: ls -R artifacts
+
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          ${{ env.PROJECT_NAME }}-self-contained.zip
-          ${{ env.PROJECT_NAME }}-framework-dependent.zip
+        files: artifacts/**/*.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
