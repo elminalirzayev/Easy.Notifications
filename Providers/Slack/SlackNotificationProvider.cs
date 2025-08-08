@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
+using System.Net.Http;
 
 namespace Easy.Notifications.Providers.Slack
 {

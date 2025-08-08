@@ -3,6 +3,7 @@ using Easy.Notifications.Core.Interfaces;
 using Easy.Notifications.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;

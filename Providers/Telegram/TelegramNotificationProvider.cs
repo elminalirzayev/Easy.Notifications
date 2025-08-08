@@ -3,6 +3,7 @@ using Easy.Notifications.Core.Interfaces;
 using Easy.Notifications.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
 
 namespace Easy.Notifications.Providers.Telegram
 {
