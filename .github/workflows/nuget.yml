@@ -37,6 +37,8 @@ jobs:
         artifact-configuration-slug: "nuget" 
         signing-policy-slug: "NuGet_Release_Signing" 
         input-artifact-path: "out/Easy.Logging.*.nupkg"
+        github-artifact-id: ${{ github.run_id }}
+        wait-for-completion: true
         output-artifact-path: "out/signed"
 
     - name: Push signed package to NuGet
