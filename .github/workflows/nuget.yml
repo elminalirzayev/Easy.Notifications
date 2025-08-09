@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*' 
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -25,21 +25,26 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Pack
-      run:  dotnet pack --configuration Release -p:ContinuousIntegrationBuild=true -o out
+      run: dotnet pack --configuration Release -p:ContinuousIntegrationBuild=true -o out
 
-    # SignPath.io ile imzalama
+    - name: Upload NuGet package artifact
+      id: upload-nuget
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-package
+        path: out/*.nupkg
+
     - name: Sign NuGet Package with SignPath
       uses: signpath/github-action-submit-signing-request@v0.4
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
         organization-id: ${{ secrets.SIGNPATH_ORG_ID }}
-        project-slug: "Easy-Notification" 
-        artifact-configuration-slug: "nuget" 
-        signing-policy-slug: "NuGet_Release_Signing" 
-        input-artifact-path: "out/Easy.Logging.*.nupkg"
-        github-artifact-id: ${{ github.run_id }}
+        project-slug: "Easy-Notification"
+        artifact-configuration-slug: "nuget"
+        signing-policy-slug: "NuGet_Release_Signing"
+        github-artifact-id: ${{ steps.upload-nuget.outputs.artifact-id }}
         wait-for-completion: true
-        output-artifact-path: "out/signed"
+        output-artifact-directory: "signed"
 
     - name: Push signed package to NuGet
-      run: dotnet nuget push "out/signed/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push "signed/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
