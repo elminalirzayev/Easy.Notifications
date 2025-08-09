@@ -1,0 +1,34 @@
+name: Code Quality and Security Scan
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    name: Check Code Format
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: dotnet format (verify only)
+        run: dotnet format --verify-no-changes
+  codeql-scan:
+    runs-on: ubuntu-latest
+    name: CodeQL Security Scan
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
