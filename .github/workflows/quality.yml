@@ -6,6 +6,7 @@ on:
   pull_request:
 
 jobs:
+
   format-check:
     runs-on: ubuntu-latest
     name: Check Code Format
@@ -17,8 +18,19 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Find solution file
+        id: find-sln
+        run: |
+          echo "##[group]List solution files"
+          ls *.sln || true
+          echo "##[endgroup]"
+          slnFile=$(ls *.sln | head -n 1)
+          echo "Solution file found: $slnFile"
+          echo "sln-file=$slnFile" >> $GITHUB_OUTPUT
+
       - name: dotnet format (verify only)
-        run: dotnet format --verify-no-changes
+        run: dotnet format ${{ steps.find-sln.outputs.sln-file }} --verify-no-changes
+
   codeql-scan:
     runs-on: ubuntu-latest
     name: CodeQL Security Scan
