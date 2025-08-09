@@ -148,4 +148,4 @@ MIT License.
 
 ---
 
-© 2025 Elmin Alirzayev / Easy Code Tools
+© Elmin Alirzayev 2025 / Easy Code Tools
