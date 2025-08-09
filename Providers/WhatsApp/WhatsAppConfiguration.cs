@@ -2,8 +2,8 @@
 {
     public class WhatsAppConfiguration
     {
-        public string AccountSid { get; set; }
-        public string AuthToken { get; set; }
-        public string Sender { get; set; }
+        public string AccountSid { get; set; } = string.Empty;
+        public string AuthToken { get; set; } = string.Empty;
+        public string Sender { get; set; } = string.Empty;
     }
 }

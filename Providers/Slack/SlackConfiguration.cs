@@ -2,8 +2,8 @@
 {
     public class SlackConfiguration
     {
-        public string WebhookUrl { get; set; }
-        public string Channel { get; set; } // Opsiyonel
+        public string WebhookUrl { get; set; } = string.Empty;
+        public string Channel { get; set; } = string.Empty; // Optional
     }
 
 }

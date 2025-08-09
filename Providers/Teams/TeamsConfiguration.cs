@@ -2,6 +2,6 @@
 {
     public class TeamsConfiguration
     {
-        public string WebhookUrl { get; set; }
+        public string WebhookUrl { get; set; } = string.Empty;
     }
 }

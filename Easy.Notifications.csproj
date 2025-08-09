@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<!--<TargetFramework>netstandard2.1</TargetFramework>-->
+		<!--<TargetFrameworks>net48</TargetFrameworks>-->
 		<TargetFrameworks>net9.0;net8.0;net7.0;net6.0;net48;net47;netstandard2.1;</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -24,7 +24,7 @@
 		<AssemblyTitle>Easy.Notifications</AssemblyTitle>
 		<AssemblyName>Easy.Notifications</AssemblyName>
 		<PackageId>Easy.Notifications</PackageId>
-		<Version>1.0.9</Version>
+		<Version>1.0.10</Version>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
 		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>

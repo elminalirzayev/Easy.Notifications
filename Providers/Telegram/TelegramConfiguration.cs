@@ -2,7 +2,7 @@
 {
     public class TelegramConfiguration
     {
-        public string BotToken { get; set; }
-        public string ChatId { get; set; }
+        public string BotToken { get; set; } = string.Empty;
+        public string ChatId { get; set; } = string.Empty;
     }
 }

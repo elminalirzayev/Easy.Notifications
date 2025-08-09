@@ -7,11 +7,11 @@ namespace Easy.Notifications.Configuration
 {
     public class NotificationConfiguration
     {
-        public NotificationOptions NotificationOptions { get; set; }
-        public NotificationProviders NotificationProviders { get; set; }
-        public EmailConfiguration EmailConfiguration { get; set; }
-        public SmsConfiguration SmsConfiguration { get; set; }
-        public SlackConfiguration SlackConfiguration { get; set; }
-        public TeamsConfiguration TeamsConfiguration { get; set; }
+        public NotificationOptions? NotificationOptions { get; set; }
+        public NotificationProviders? NotificationProviders { get; set; }
+        public EmailConfiguration? EmailConfiguration { get; set; }
+        public SmsConfiguration? SmsConfiguration { get; set; }
+        public SlackConfiguration? SlackConfiguration { get; set; }
+        public TeamsConfiguration? TeamsConfiguration { get; set; }
     }
 }
