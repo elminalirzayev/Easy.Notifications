@@ -20,13 +20,14 @@ jobs:
 
       - name: Find solution file
         id: find-sln
+        shell: pwsh
         run: |
-          echo "##[group]List solution files"
-          ls *.sln || true
-          echo "##[endgroup]"
-          slnFile=$(ls *.sln | head -n 1)
-          echo "Solution file found: $slnFile"
-          echo "sln-file=$slnFile" >> $GITHUB_OUTPUT
+          Write-Host "##[group]List solution files"
+          Get-ChildItem -Filter *.sln
+          Write-Host "##[endgroup]"
+          $slnFile = Get-ChildItem -Filter *.sln | Select-Object -First 1
+          Write-Host "Solution file found: $($slnFile.Name)"
+          "sln-file=$($slnFile.Name)" >> $env:GITHUB_OUTPUT
 
       - name: dotnet format (verify only)
         run: dotnet format ${{ steps.find-sln.outputs.sln-file }} --verify-no-changes
