@@ -40,7 +40,7 @@
 		<!-- Build -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
-		<!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<LangVersion>10.0</LangVersion>
 
 
