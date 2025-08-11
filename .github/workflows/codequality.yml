@@ -9,7 +9,7 @@ jobs:
 
   format-check:
     runs-on: windows-latest
-    name: Check Code Format
+    name: Check Code Format and Lint
     steps:
       - uses: actions/checkout@v4
 
@@ -31,6 +31,12 @@ jobs:
 
       - name: dotnet format (verify only)
         run: dotnet format ${{ steps.find-sln.outputs.sln-file }} --verify-no-changes
+
+      - name: Build with analyzers enabled (treat warnings as errors)
+        run: dotnet build ${{ steps.find-sln.outputs.sln-file }} -warnaserror
+
+      - name: Check for vulnerable dependencies
+        run: dotnet list package --vulnerable
 
   codeql-scan:
     runs-on: ubuntu-latest
