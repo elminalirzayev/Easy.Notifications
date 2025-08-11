@@ -8,7 +8,7 @@ on:
 jobs:
 
   format-check:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     name: Check Code Format
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +37,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: csharp
+          build-mode: manual
+
+      - name: Find solution file
+        id: find-sln
+        run: |
+          echo "##[group]List solution files"
+          ls *.sln || true
+          echo "##[endgroup]"
+          slnFile=$(ls *.sln | head -n 1)
+          echo "Solution file found: $slnFile"
+          echo "sln-file=$slnFile" >> $GITHUB_OUTPUT
+
+      - name: Build the solution
+        run: dotnet build ${{ steps.find-sln.outputs.sln-file }} --configuration Release
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
