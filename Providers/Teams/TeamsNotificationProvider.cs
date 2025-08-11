@@ -52,21 +52,21 @@ namespace Easy.Notifications.Providers.Teams
         public async Task SendAsync(NotificationMessage message)
         {
             // Try to get a custom Teams card from metadata, otherwise create a default card
-            var card = message.Metadata.TryGetValue("teamsCard", out var obj)
-               ? obj as TeamsMessageCard
-               : new TeamsMessageCard
-               {
-                   Summary = message.Title,
-                   Title = message.Title,
-                   ThemeColor = "0076D7",
-                   Sections = new List<TeamsSection>
-                   {
-                        new TeamsSection
-                        {
-                            Text = message.Body
-                        }
-                   }
-               };
+            var card = (message.Metadata != null && message.Metadata.TryGetValue("teamsCard", out var obj))
+                         ? obj as TeamsMessageCard
+                         : new TeamsMessageCard
+                         {
+                             Summary = message.Title,
+                             Title = message.Title,
+                             ThemeColor = "0076D7",
+                             Sections = new List<TeamsSection>
+                             {
+                                new TeamsSection
+                                {
+                                    Text = message.Body
+                                }
+                             }
+                         };
 
             // Serialize the card to JSON with camelCase property names
             var json = JsonSerializer.Serialize(card, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });

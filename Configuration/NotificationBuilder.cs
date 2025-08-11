@@ -31,26 +31,26 @@ namespace Easy.Notifications.Configuration
 
             #region Email
 
-            if (config.NotificationOptions.UseEmail)
+            if (config?.NotificationOptions?.UseEmail == true)
             {
-                switch (config.NotificationProviders.EmailProvider)
+                switch (config?.NotificationProviders?.EmailProvider)
                 {
                     case EmailProviderType.Smtp:
-                        EnsureSmtpConfig(config.EmailConfiguration);
+                        EnsureSmtpConfig(config?.EmailConfiguration);
                         services.Configure<EmailConfiguration>(section.GetSection("EmailConfiguration"));
                         services.AddSingleton<INotificationProvider, SmtpEmailNotificationProvider>();
                         break;
                     case EmailProviderType.Sendgrid:
-                        EnsureSendGridConfig(config.EmailConfiguration);
+                        EnsureSendGridConfig(config?.EmailConfiguration);
                         services.Configure<EmailConfiguration>(section.GetSection("EmailConfiguration"));
                         services.AddSingleton<ISendGridClient>(sp =>
                         {
-                            return new SendGridClient(config.EmailConfiguration?.ApiKey);
+                            return new SendGridClient(config?.EmailConfiguration?.ApiKey);
                         });
                         services.AddSingleton<INotificationProvider, SendgridEmailNotificationProvider>();
                         break;
                     case EmailProviderType.Mailgun:
-                        EnsureMailgunConfig(config.EmailConfiguration);
+                        EnsureMailgunConfig(config?.EmailConfiguration);
                         services.Configure<EmailConfiguration>(section.GetSection("EmailConfiguration"));
                         services.AddSingleton<INotificationProvider, MailgunEmailNotificationProvider>();
                         break;
@@ -64,19 +64,19 @@ namespace Easy.Notifications.Configuration
             #region SMS
 
 
-            if (config.NotificationOptions.UseSms)
+            if (config?.NotificationOptions?.UseSms == true)
             {
-                switch (config.NotificationProviders.SmsProvider)
+                switch (config?.NotificationProviders?.SmsProvider)
                 {
                     case SmsProviderType.Vonage: //nexmo
-                        EnsureVonageConfig(config.SmsConfiguration);
+                        EnsureVonageConfig(config?.SmsConfiguration);
                         services.Configure<SmsConfiguration>(section.GetSection("SmsConfiguration"));
                         services.AddSingleton<INotificationProvider, VonageSmsProvider>();
                         break;
                     case SmsProviderType.Twilio:
-                        EnsureTwilioConfig(config.SmsConfiguration);
+                        EnsureTwilioConfig(config?.SmsConfiguration);
                         services.Configure<SmsConfiguration>(section.GetSection("SmsConfiguration"));
-                        services.AddSingleton<ITwilioRestClient>(sp => new TwilioRestClient(config.SmsConfiguration.Username, config.SmsConfiguration.Password));
+                        services.AddSingleton<ITwilioRestClient>(sp => new TwilioRestClient(config?.SmsConfiguration?.Username, config?.SmsConfiguration?.Password));
                         services.AddSingleton<INotificationProvider, TwilioSmsProvider>();
                         break;
                     default:
@@ -89,7 +89,7 @@ namespace Easy.Notifications.Configuration
 
             #region WhatsApp (Twilio)
 
-            if (config.NotificationOptions.UseWhatsApp)
+            if (config?.NotificationOptions?.UseWhatsApp == true)
             {
                 services.Configure<WhatsAppConfiguration>(section.GetSection("WhatsAppConfiguration"));
                 services.AddSingleton<INotificationProvider, TwilioWhatsAppNotificationProvider>();
@@ -99,8 +99,10 @@ namespace Easy.Notifications.Configuration
 
             #region Telegram
 
-            if (config.NotificationOptions.UseTelegram)
+            if (config?.NotificationOptions?.UseTelegram == true)
             {
+                EnsureTelegramConfig(config?.TelegramConfiguration);
+
                 services.Configure<TelegramConfiguration>(section.GetSection("TelegramConfiguration"));
                 services.AddHttpClient<TelegramNotificationProvider>();
                 services.AddSingleton<INotificationProvider, TelegramNotificationProvider>();
@@ -109,9 +111,9 @@ namespace Easy.Notifications.Configuration
             #endregion
 
             #region Slack
-            if (config.NotificationOptions.UseSlack)
+            if (config?.NotificationOptions?.UseSlack == true)
             {
-                EnsureSlackConfig(config.SlackConfiguration);
+                EnsureSlackConfig(config?.SlackConfiguration);
 
                 services.Configure<SlackConfiguration>(section.GetSection("SlackConfiguration"));
                 services.AddHttpClient<SlackNotificationProvider>();
@@ -120,7 +122,7 @@ namespace Easy.Notifications.Configuration
             #endregion
 
             #region Teams
-            if (config.NotificationOptions.UseTeams)
+            if (config?.NotificationOptions?.UseTeams == true)
             {
                 EnsureTeamsConfig(config.TeamsConfiguration);
 
@@ -132,7 +134,7 @@ namespace Easy.Notifications.Configuration
 
             #region SignalR
 
-            if (config.NotificationOptions.UseSignalR)
+            if (config?.NotificationOptions?.UseSignalR == true)
             {
 
                 services.AddSignalR();
@@ -150,7 +152,7 @@ namespace Easy.Notifications.Configuration
 
         #region Validation Helpers
 
-        private static void EnsureSmtpConfig(EmailConfiguration config)
+        private static void EnsureSmtpConfig(EmailConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("SMTP configuration section is missing.");
@@ -163,7 +165,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("SMTP email configuration is incomplete.");
         }
 
-        private static void EnsureSendGridConfig(EmailConfiguration config)
+        private static void EnsureSendGridConfig(EmailConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("SendGrid configuration section is missing.");
@@ -174,7 +176,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("SendGrid email configuration is incomplete.");
         }
 
-        private static void EnsureMailgunConfig(EmailConfiguration config)
+        private static void EnsureMailgunConfig(EmailConfiguration? config)
         {
 
             if (config == null)
@@ -185,7 +187,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Mailgun configuration is incomplete.");
         }
 
-        private static void EnsureVonageConfig(SmsConfiguration config)
+        private static void EnsureVonageConfig(SmsConfiguration? config)
         {
 
             if (config == null)
@@ -197,7 +199,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Vonage SMS configuration is incomplete.");
         }
 
-        private static void EnsureTwilioConfig(SmsConfiguration config)
+        private static void EnsureTwilioConfig(SmsConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("Twilio SMS configuration section is missing.");
@@ -209,7 +211,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Twilio SMS configuration is incomplete.");
         }
 
-        private static void EnsureWhatsAppConfig(WhatsAppConfiguration config)
+        private static void EnsureWhatsAppConfig(WhatsAppConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("WhatsApp configuration section is missing.");
@@ -220,7 +222,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("WhatsApp configuration is incomplete. Required fields: AccountSid, AuthToken, Sender.");
         }
 
-        private static void EnsureTelegramConfig(TelegramConfiguration config)
+        private static void EnsureTelegramConfig(TelegramConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("Telegram configuration section is missing.");
@@ -231,7 +233,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Telegram configuration is incomplete. Required fields: BotToken, ChatId.");
         }
 
-        private static void EnsureSlackConfig(SlackConfiguration config)
+        private static void EnsureSlackConfig(SlackConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("Slack configuration section is missing.");
@@ -240,7 +242,7 @@ namespace Easy.Notifications.Configuration
                 throw new InvalidOperationException("Slack WebhookUrl is required.");
         }
 
-        private static void EnsureTeamsConfig(TeamsConfiguration config)
+        private static void EnsureTeamsConfig(TeamsConfiguration? config)
         {
             if (config == null)
                 throw new InvalidOperationException("Teams configuration section is missing.");

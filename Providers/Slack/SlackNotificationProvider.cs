@@ -52,9 +52,10 @@ namespace Easy.Notifications.Providers.Slack
         public async Task SendAsync(NotificationMessage message)
         {
             // If there is a custom block in metadata, use it; otherwise, create a default block payload
-            var payload = message.Metadata.TryGetValue("slackBlock", out var obj)
-                ? obj
-                : CreateDefaultBlockPayload(message);
+            var payload = message.Metadata?.TryGetValue("slackBlock", out var obj) == true
+                           ? obj
+                           : CreateDefaultBlockPayload(message);
+
 
             // Serialize the payload to JSON and prepare the HTTP content
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
