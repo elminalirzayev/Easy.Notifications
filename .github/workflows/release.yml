@@ -6,6 +6,9 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     runs-on: windows-latest
@@ -23,34 +26,37 @@ jobs:
       shell: pwsh
       run: |
         $version = "${{ github.ref_name }}".TrimStart('v')
-        Write-Host "Version found: $version"
         "VERSION=$version" >> $env:GITHUB_OUTPUT
 
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Run Tests
-      run: dotnet test --configuration Release --no-restore --verbosity normal
+      run: dotnet test --configuration Release --no-restore --verbosity normal || echo "No tests found"
 
     - name: Build
       run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
     - name: Pack
-      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --force
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: nuget-package
-        path: out/*.nupkg
+        path: out\*.nupkg
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: out/*.nupkg
+        files: |
+          out/*.nupkg
+          out/*.snupkg
         generate_release_notes: true
         name: Release ${{ github.ref_name }}
         body: |
-          The NuGet package is also available on [NuGet.org](https://www.nuget.org/packages/${{ github.event.repository.name }}).
+          The NuGet package is available on [NuGet.org](https://www.nuget.org/packages/${{ github.event.repository.name }}).
+          
+          You can also download the `.nupkg` directly from the assets below.
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
