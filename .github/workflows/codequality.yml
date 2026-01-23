@@ -8,12 +8,14 @@ on:
 permissions:
   security-events: write
   contents: read
+  checks: write  
+  pull-requests: write
 
 jobs:
 
-  format-check:
+  build-and-test:
     runs-on: windows-latest
-    name: Check Code Format and Lint
+    name: Build, Format & Test
     steps:
       - uses: actions/checkout@v4
 
@@ -21,29 +23,32 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
 
       - name: Find solution file
         id: find-sln
         shell: pwsh
         run: |
-          Write-Host "##[group]List solution files"
-          Get-ChildItem -Filter *.sln
-          Write-Host "##[endgroup]"
           $slnFile = Get-ChildItem -Filter *.sln | Select-Object -First 1
-          Write-Host "Solution file found: $($slnFile.Name)"
           "sln-file=$($slnFile.Name)" >> $env:GITHUB_OUTPUT
 
-      - name: dotnet format (verify only)
+      - name: Restore dependencies
+        run: dotnet restore ${{ steps.find-sln.outputs.sln-file }}
+
+      - name: Check Code Format
         run: dotnet format ${{ steps.find-sln.outputs.sln-file }} --verify-no-changes
 
-      - name: Build with analyzers enabled (treat warnings as errors)
-        run: dotnet build ${{ steps.find-sln.outputs.sln-file }} -warnaserror
+      - name: Build (Strict)
+        run: dotnet build ${{ steps.find-sln.outputs.sln-file }} --no-restore -warnaserror
+
+      - name: Run Unit Tests
+        run: dotnet test ${{ steps.find-sln.outputs.sln-file }} --no-build --verbosity normal
 
       - name: Check for vulnerable dependencies
         run: dotnet list package --vulnerable
 
   codeql-scan:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest 
     name: CodeQL Security Scan
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +57,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -61,13 +67,10 @@ jobs:
 
       - name: Find solution file
         id: find-sln
+        shell: pwsh
         run: |
-          echo "##[group]List solution files"
-          ls *.sln || true
-          echo "##[endgroup]"
-          slnFile=$(ls *.sln | head -n 1)
-          echo "Solution file found: $slnFile"
-          echo "sln-file=$slnFile" >> $GITHUB_OUTPUT
+          $slnFile = Get-ChildItem -Filter *.sln | Select-Object -First 1
+          "sln-file=$($slnFile.Name)" >> $env:GITHUB_OUTPUT
 
       - name: Build the solution
         run: dotnet build ${{ steps.find-sln.outputs.sln-file }} --configuration Release
