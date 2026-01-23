@@ -74,6 +74,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="Vonage" Version="8.2.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' Or '$(TargetFramework)' == 'net6.0'">
@@ -81,18 +83,24 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
 		<PackageReference Include="Vonage" Version="6.12.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' Or '$(TargetFramework)' == 'net47'">
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="Vonage" Version="8.2.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1'">
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="Vonage" Version="8.2.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+
 	</ItemGroup>
 
 </Project>
