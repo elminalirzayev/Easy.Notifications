@@ -11,16 +11,16 @@
 
 ## Features
 
-- 🔌 Plug-and-play support for:
+- Plug-and-play support for:
   - SMTP, SendGrid, Mailgun
   - Twilio, Vonage (SMS & WhatsApp)
   - Telegram Bots
   - Slack (Block Kit)
   - Microsoft Teams (MessageCard)
-- 📦 Simple service registration via `AddEasyNotifications()`
-- 🧩 Extensible provider model
-- 🔒 Configuration-based setup
-- ☁️ SignalR support (optional)
+- Simple service registration via `AddEasyNotifications()`
+- Extensible provider model
+- Configuration-based setup
+- SignalR support (optional)
 
 ## Installation
 
