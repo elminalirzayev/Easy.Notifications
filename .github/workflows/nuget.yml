@@ -36,7 +36,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-build -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
