@@ -1,4 +1,4 @@
-﻿name: Publish NuGet
+﻿name: Release Package
 
 on:
   workflow_dispatch:
@@ -36,7 +36,21 @@ jobs:
       run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
     - name: Pack
-      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --force
+      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
-    - name: Push package to NuGet
-      run: dotnet nuget push out\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: out/*.nupkg
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: out/*.nupkg
+        generate_release_notes: true
+        name: Release ${{ github.ref_name }}
+        body: |
+          The NuGet package is also available on [NuGet.org](https://www.nuget.org/packages/${{ github.event.repository.name }}).
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
