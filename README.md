@@ -97,7 +97,8 @@ Configure only the providers you intend to use.
     "VonageConfiguration": {
       "ApiKey": "a1b2c3d4",
       "ApiSecret": "xxxxxxxxxxxx",
-      "Sender": "MyBrand"
+      "Sender": "MyBrand",
+      "FromNumber": "MyBrand"
     },
     "MailgunConfiguration": {
       "ApiKey": "<MAILGUN_API_KEY>",
@@ -127,15 +128,19 @@ builder.Services.AddEasyNotifications();
 // 2. Add Desired Providers (Modular Registration)
 // Email
 builder.Services.AddSmtpEmail(builder.Configuration);
+// builder.Services.AddSendGrid(builder.Configuration);
+// builder.Services.AddMailgun(builder.Configuration);
 
 // SMS & WhatsApp
 builder.Services.AddTwilio(builder.Configuration);
+// builder.Services.AddVonage(builder.Configuration);
 
 // Chat Apps (Slack, Teams, Telegram)
 builder.Services.AddChatProviders(builder.Configuration);
 
 // Realtime
 builder.Services.AddSignalRNotifications();
+
 
 var app = builder.Build();
 
@@ -236,18 +241,19 @@ await _notifier.SendAsync(payload);
 
 ##  Supported Providers
 
-| Channel | Provider Class | NuGet Dependency | Notes |
-| --- | --- | --- | --- |
-| **Email** | `SmtpEmailProvider` | Built-in | Standard .NET `SmtpClient` |
-| **Email** | `SendGridProvider` | `SendGrid` | Uses SendGrid Web API |
-| **Email** | `MailgunProvider` | `Microsoft.Extensions.Http` | Uses Mailgun API v3 |
-| **SMS** | `TwilioSmsProvider` | `Twilio` | Standard SMS |
-| **SMS** | `VonageSmsProvider` | Built-in | Uses Nexmo/Vonage REST API |
+| Channel      | Provider Class           | NuGet Dependency | Notes |
+| ---          | ---                      | ---      | --- |
+| **Email**    | `SmtpEmailProvider`      | Built-in | Standard .NET `SmtpClient` |
+| **Email**    | `SendGridProvider`       | `SendGrid` | Uses SendGrid Web API |
+| **Email**    | `MailgunProvider`        | `Microsoft.Extensions.Http` | Uses Mailgun API v3 |
+| **SMS**      | `TwilioSmsProvider`      | `Twilio` | Standard SMS |
+| **SMS**      | `VonageSmsProvider`      | Built-in | Uses Nexmo/Vonage REST API |
 | **WhatsApp** | `TwilioWhatsAppProvider` | `Twilio` | Requires WhatsApp Sandbox/Number |
-| **Slack** | `SlackProvider` | Built-in | Uses Incoming Webhooks (Block Kit) |
-| **Teams** | `TeamsProvider` | Built-in | Uses Incoming Webhooks (MessageCard) |
-| **Telegram** | `TelegramProvider` | Built-in | Uses Telegram Bot API |
-| **Realtime** | `SignalRProvider` | `Microsoft.AspNetCore.SignalR.Core` | Pushes to connected clients |
+| **WhatsApp** | `VonageWhatsAppProvider` | Built-in | Requires WhatsApp Sandbox/Number |
+| **Slack**    | `SlackProvider`          | Built-in | Uses Incoming Webhooks (Block Kit) |
+| **Teams**    | `TeamsProvider`          | Built-in | Uses Incoming Webhooks (MessageCard) |
+| **Telegram** | `TelegramProvider`       | Built-in | Uses Telegram Bot API |
+| **Realtime** | `SignalRProvider`        | `Microsoft.AspNetCore.SignalR.Core` | Pushes to connected clients |
 
 
 ##  Extending
