@@ -6,16 +6,16 @@ using Twilio.Clients;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 
-namespace Easy.Notifications.Providers.Sms
+namespace Easy.Notifications.Providers.Chat
 {
-    public class TwilioSmsProvider : INotificationProvider
+    public class TwilioWhatsAppProvider : INotificationProvider
     {
         private readonly TwilioConfiguration _config;
         private readonly ITwilioRestClient _client;
-        private readonly ILogger<TwilioSmsProvider> _logger;
-        public NotificationChannelType SupportedChannel => NotificationChannelType.Sms;
+        private readonly ILogger<TwilioWhatsAppProvider> _logger;
+        public NotificationChannelType SupportedChannel => NotificationChannelType.WhatsApp;
 
-        public TwilioSmsProvider(IOptions<TwilioConfiguration> config, ITwilioRestClient client, ILogger<TwilioSmsProvider> logger)
+        public TwilioWhatsAppProvider(IOptions<TwilioConfiguration> config, ITwilioRestClient client, ILogger<TwilioWhatsAppProvider> logger)
         {
             _config = config.Value;
             _client = client;
@@ -26,9 +26,12 @@ namespace Easy.Notifications.Providers.Sms
         {
             try
             {
+                var toNum = recipient.Value.StartsWith("whatsapp:") ? recipient.Value : $"whatsapp:{recipient.Value}";
+                var fromNum = _config.FromNumber.StartsWith("whatsapp:") ? _config.FromNumber : $"whatsapp:{_config.FromNumber}";
+
                 var msg = await MessageResource.CreateAsync(
-                    to: new PhoneNumber(recipient.Value),
-                    from: new PhoneNumber(_config.FromNumber),
+                    to: new PhoneNumber(toNum),
+                    from: new PhoneNumber(fromNum),
                     body: body,
                     client: _client
                 );
@@ -36,7 +39,7 @@ namespace Easy.Notifications.Providers.Sms
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Twilio SMS Failed to {Phone}", recipient.Value);
+                _logger.LogError(ex, "Twilio WhatsApp Failed to {Phone}", recipient.Value);
                 return false;
             }
         }

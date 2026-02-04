@@ -23,13 +23,16 @@
 		<AssemblyTitle>Easy.Notifications</AssemblyTitle>
 		<AssemblyName>Easy.Notifications</AssemblyName>
 		<PackageId>Easy.Notifications</PackageId>
-		<Version>1.0.14</Version>
+		<Version>1.1.0</Version>
 		<PackageIcon>icon.png</PackageIcon>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
 		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>
-		<Description>A modular and extensible .NET notification system that supports multiple channels like Email (SMTP, SendGrid, Mailgun), SMS (Twilio, Vonage), Telegram, Slack, Microsoft Teams, WhatsApp, and SignalR. Designed for easy configuration, scalability, and integration into modern applications.</Description>
-		<PackageTags>dotnet notifications email sms slack teams whatsapp telegram signalr sendgrid twilio mailgun smtp real-time hub</PackageTags>
+		<Description>
+			The ultimate .NET notification library for Enterprise applications. Unified API for sending Email (SMTP, SendGrid, Mailgun), SMS &amp; WhatsApp (Twilio, Vonage), Chat (Slack Block Kit, Microsoft Teams Cards, Telegram), and Real-time WebSockets (SignalR).
+			Features include "Fire-and-Forget" background queuing, rich content templates, modular architecture, and thread-safe execution. Perfect for alerting, OTPs, and system notifications.
+		</Description>
+		<PackageTags>dotnet notification-service email sms whatsapp slack teams telegram signalr sendgrid twilio vonage mailgun smtp background-jobs messaging alerts webhook realtime fluent-api</PackageTags>
 		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -68,6 +71,7 @@
 		<PackageReference Include="Twilio" Version="7.14.2" />
 	</ItemGroup>
 
+
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0'">
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
@@ -79,7 +83,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="Vonage" Version="8.2.0" />
-		<PackageReference Include="System.Text.Json" Version="10.0.2" />
 
 	</ItemGroup>
 
@@ -88,7 +91,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
 		<PackageReference Include="Vonage" Version="6.12.0" />
-		<PackageReference Include="System.Text.Json" Version="10.0.2" />
 
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' Or '$(TargetFramework)' == 'net47'">
@@ -105,7 +107,5 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
 		<PackageReference Include="Vonage" Version="8.2.0" />
 		<PackageReference Include="System.Text.Json" Version="10.0.2" />
-
 	</ItemGroup>
-
 </Project>

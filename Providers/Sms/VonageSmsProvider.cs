@@ -1,80 +1,49 @@
-﻿using Easy.Notifications.Core.Enums;
-using Easy.Notifications.Core.Interfaces;
+﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Vonage;
-using Vonage.Messaging;
-using Vonage.Request;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace Easy.Notifications.Providers.Sms
 {
-    public class VonageSmsProvider : ISmsProvider
+    public class VonageSmsProvider : INotificationProvider
     {
-
-
-        private readonly SmsConfiguration _settings;
-        private readonly VonageClient _client;
+        private readonly VonageConfiguration _config;
+        private readonly HttpClient _httpClient;
         private readonly ILogger<VonageSmsProvider> _logger;
+        public NotificationChannelType SupportedChannel => NotificationChannelType.Sms;
 
-        public ChannelType Channel => ChannelType.Sms;
-        public string Name => "Vonage";
-
-
-        public VonageSmsProvider(IOptions<SmsConfiguration> options, ILogger<VonageSmsProvider> logger)
+        public VonageSmsProvider(IOptions<VonageConfiguration> config, IHttpClientFactory factory, ILogger<VonageSmsProvider> logger)
         {
-            _settings = options.Value;
+            _config = config.Value;
+            _httpClient = factory.CreateClient("Vonage");
             _logger = logger;
-
-            var credentials = Credentials.FromApiKeyAndSecret(_settings.Username, _settings.Password);
-            _client = new VonageClient(credentials);
         }
 
-        public async Task SendAsync(NotificationMessage message)
+        public async Task<bool> SendAsync(Recipient recipient, string subject, string body, Dictionary<string, object>? metadata = null)
         {
-            if (!message.Recipients.Any())
+            try
             {
-                _logger.LogWarning("Vonage: Alıcı listesi boş.");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(message.Body))
-            {
-                _logger.LogWarning("Vonage: Mesaj içeriği boş.");
-                return;
-            }
-            _logger.LogInformation("Vonage SMS gönderiliyor: {RecipientsCount} alıcı", message.Recipients.Count);
-
-
-            foreach (var to in message.Recipients)
-            {
-                try
+                var payload = new
                 {
-                    var request = new SendSmsRequest
-                    {
-                        To = to,
-                        From = _settings.Sender,
-                        Text = message.Body
-                    };
+                    api_key = _config.ApiKey,
+                    api_secret = _config.ApiSecret,
+                    from = _config.Sender,
+                    to = recipient.Value,
+                    text = body
+                };
 
-                    var response = await _client.SmsClient.SendAnSmsAsync(request);
-
-                    if (response.Messages[0].Status != "0")
-                    {
-                        throw new InvalidOperationException($"Vonage SMS gönderimi başarısız: {response.Messages[0].ErrorText}");
-                    }
-
-
-                    _logger.LogInformation("SMS gönderildi: {To}, SID: {Sid}", to, response.Messages[0].MessageId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Vonage ile SMS gönderilemedi: {To}", to);
-                }
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("https://rest.nexmo.com/sms/json", content);
+                return response.IsSuccessStatusCode;
             }
-
-
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Vonage SMS Failed to {Phone}", recipient.Value);
+                return false;
+            }
         }
     }
 }
