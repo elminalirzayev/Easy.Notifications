@@ -94,6 +94,17 @@ Configure only the providers you intend to use.
       "SenderEmail": "alert@example.com",
       "SenderName": "Alert Bot"
     },
+    "VonageConfiguration": {
+      "ApiKey": "a1b2c3d4",
+      "ApiSecret": "xxxxxxxxxxxx",
+      "Sender": "MyBrand"
+    },
+    "MailgunConfiguration": {
+      "ApiKey": "<MAILGUN_API_KEY>",
+      "Domain": "<MAILGUN_DOMAIN>",
+      "SenderEmail": "noreply@example.com",
+      "SenderName": "Easy Notifications"
+    },
     "TelegramConfiguration": {
       "BotToken": "123456:ABC-DEF..."
     }
@@ -273,47 +284,6 @@ This project is licensed under the MIT License.
 ---
 
 © 2025 Elmin Alirzayev / Easy Code Tools
-
-
-
-
-```json
-{
--"SmsProvider": "Twilio" // Options: "Twilio", "Vonage" (ex nexmo)
-    },
-
-    // SendGrid
-    "EmailConfiguration": {
-      "ApiKey": "<SENDGRID_API_KEY>",
-      "Sender": "noreply@example.com",
-      "SenderDisplayName": "Easy Notifications"
-    },
-    */
-    // Mailgun
-    "EmailConfiguration": {
-      "ApiKey": "<MAILGUN_API_KEY>",
-      "Domain": "<MAILGUN_DOMAIN>",
-      "Sender": "noreply@example.com",
-      "SenderDisplayName": "Easy Notifications"
-    },
-    */
-    "SmsConfiguration": {
-    // Twilio
-      "Username": "<TWILIO_SID>",
-      "Password": "<TWILIO_TOKEN>",
-      "Sender": "+1234567890"
-    },
-    /*
-    // Vonage (Nexmo)
-    "SmsConfiguration": {
-      "Username": "<ACCOUNT_SID>",
-      "Password": "<AUTH_TOKEN>",
-      "Sender": "+1234567890"
-    */
-
-  }
-}
-```
 
 
 
