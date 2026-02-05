@@ -13,6 +13,11 @@
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
+        /// Gets or sets the priority level. Defaults to Normal.
+        /// </summary>
+        public NotificationPriority Priority { get; set; } = NotificationPriority.Normal; 
+
+        /// <summary>
         /// Gets or sets the subject or title of the notification.
         /// </summary>
         public string Subject { get; set; } = string.Empty;

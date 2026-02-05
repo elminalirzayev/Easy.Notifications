@@ -1,6 +1,5 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
-using Easy.Notifications.Core.Models.Easy.Notifications.Core.Models;
 using Easy.Notifications.Infrastructure.Dispatcher;
 using Easy.Notifications.Infrastructure.Templating;
 using Easy.Notifications.Providers.Chat;
@@ -21,25 +20,34 @@ namespace Easy.Notifications.Extensions
     public static class NotificationServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds the core notification services including Dispatcher, In-memory Queue, and Template Engine.
+        /// Adds the core notification services including Priority Dispatcher and separate Channels for each priority level.
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddEasyNotifications(this IServiceCollection services)
         {
             services.TryAddSingleton<ITemplateEngine, StringTemplateEngine>();
+
+            // 1. Create separate channels for each priority level
+            var channels = new Dictionary<NotificationPriority, Channel<NotificationPayload>>();
+            foreach (NotificationPriority priority in Enum.GetValues(typeof(NotificationPriority)))
+            {
+                channels.Add(priority, Channel.CreateUnbounded<NotificationPayload>());
+            }
+
+            // 2. Register the dictionary as a singleton so Dispatcher and Worker can access it
+            services.AddSingleton<IDictionary<NotificationPriority, Channel<NotificationPayload>>>(channels);
+
+            // 3. Update Dispatcher to use the priority-aware implementation
             services.TryAddSingleton<INotificationService, NotificationDispatcher>();
 
-            // Create a thread-safe unbounded channel for background processing
-            services.AddSingleton(Channel.CreateUnbounded<NotificationPayload>());
-
-            // Register the primary background worker that processes the queue
+            // 4. Register the background worker that processes priority queues
             services.AddHostedService<BackgroundNotificationWorker>();
 
             return services;
         }
 
-    
+
         /// <summary>
         /// Enables the background retry mechanism for failed notifications with custom configuration.
         /// </summary>
