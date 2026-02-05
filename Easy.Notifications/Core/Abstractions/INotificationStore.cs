@@ -1,4 +1,6 @@
-﻿namespace Easy.Notifications.Core.Abstractions
+﻿using Easy.Notifications.Core.Models;
+
+namespace Easy.Notifications.Core.Abstractions
 {
     /// <summary>
     /// Defines storage operations for notification history logging.
@@ -25,5 +27,12 @@
         /// <param name="errorMessage">Detailed error message if the operation failed.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task UpdateStatusAsync(Guid id, bool isSuccess, string? errorMessage = null);
+
+        /// <summary>
+        /// Retrieves notifications that failed and are scheduled for a retry.
+        /// </summary>
+        /// <param name="maxRetryCount">The maximum allowed retry attempts.</param>
+        /// <returns>A list of notification payloads ready to be re-dispatched.</returns>
+        Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount);
     }
 }

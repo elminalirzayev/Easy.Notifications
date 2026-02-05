@@ -3,7 +3,7 @@
 namespace Easy.Notifications.Persistence.Entities
 {
     /// <summary>
-    /// Represents a persistent record of a sent notification.
+    /// Represents a persistent record of a sent notification with retry capabilities.
     /// </summary>
     public class NotificationLog
     {
@@ -16,5 +16,15 @@ namespace Easy.Notifications.Persistence.Entities
         public string? ErrorMessage { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? SentAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of times this notification has been attempted.
+        /// </summary>
+        public int RetryCount { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets the scheduled time for the next retry attempt.
+        /// </summary>
+        public DateTime? NextRetryAt { get; set; }
     }
 }

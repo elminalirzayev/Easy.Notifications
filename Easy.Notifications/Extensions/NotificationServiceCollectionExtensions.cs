@@ -1,5 +1,6 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
+using Easy.Notifications.Core.Models.Easy.Notifications.Core.Models;
 using Easy.Notifications.Infrastructure.Dispatcher;
 using Easy.Notifications.Infrastructure.Templating;
 using Easy.Notifications.Providers.Chat;
@@ -32,8 +33,23 @@ namespace Easy.Notifications.Extensions
             // Create a thread-safe unbounded channel for background processing
             services.AddSingleton(Channel.CreateUnbounded<NotificationPayload>());
 
-            // Register the background worker that processes the queue
+            // Register the primary background worker that processes the queue
             services.AddHostedService<BackgroundNotificationWorker>();
+
+            return services;
+        }
+
+    
+        /// <summary>
+        /// Enables the background retry mechanism for failed notifications with custom configuration.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="config">The application configuration section (e.g., NotificationConfiguration:RetryConfiguration).</param>
+        /// <returns>The updated service collection.</returns>
+        public static IServiceCollection AddNotificationRetryWorker(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<RetryConfiguration>(config.GetSection("NotificationConfiguration:RetryConfiguration"));
+            services.AddHostedService<NotificationRetryWorker>();
 
             return services;
         }
