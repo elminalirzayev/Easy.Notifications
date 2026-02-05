@@ -24,7 +24,7 @@
 		<AssemblyTitle>Easy.Notifications</AssemblyTitle>
 		<AssemblyName>Easy.Notifications</AssemblyName>
 		<PackageId>Easy.Notifications</PackageId>
-		<Version>1.1.11</Version>
+		<Version>1.1.12</Version>
 		<PackageIcon>icon.png</PackageIcon>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
@@ -95,7 +95,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
 		<PackageReference Include="Vonage" Version="6.12.0" />
-		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 
 
 	</ItemGroup>

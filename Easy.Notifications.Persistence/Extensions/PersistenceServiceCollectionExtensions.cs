@@ -37,6 +37,10 @@ namespace Easy.Notifications.Persistence.Extensions
             // Transient or Scoped is preferred for DbContext-dependent services
             services.TryAddScoped<INotificationStore, EfNotificationStore>();
 
+            // Raporlama servisini de ekliyoruz
+            // 3. Register the Report Service implementation as INotificationReportService
+            services.TryAddScoped<INotificationReportService, EfNotificationReportService>();
+
             return services;
         }
 #else
@@ -56,6 +60,9 @@ namespace Easy.Notifications.Persistence.Extensions
 
             // 2. Register the EF Store implementation
             services.TryAddScoped<INotificationStore, EfNotificationStore>();
+
+             // 3. Register the Report Service implementation as INotificationReportService
+            services.TryAddScoped<INotificationReportService, EfNotificationReportService>();
 
             return services;
         }
