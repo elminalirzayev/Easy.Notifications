@@ -26,7 +26,7 @@ namespace Easy.Notifications.Persistence.Implementations
         /// <summary>
         /// Records a new notification log. Initial state has RetryCount as 0.
         /// </summary>
-        public async Task SaveLogAsync(Guid id, string recipient, string channel, string subject, string body,string priority)
+        public async Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body,string priority)
         {
             var channelType = (NotificationChannelType)Enum.Parse(typeof(NotificationChannelType), channel);
             var priorityType = (NotificationPriority)Enum.Parse(typeof(NotificationPriority), priority);
@@ -34,6 +34,7 @@ namespace Easy.Notifications.Persistence.Implementations
             var log = new NotificationLog
             {
                 Id = id,
+                CorrelationId = correlationId,
                 Recipient = recipient,
                 Channel = channelType,
                 Subject = subject,

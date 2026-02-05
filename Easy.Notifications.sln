@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications", "Easy.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications.Persistence", "Easy.Notifications.Persistence\Easy.Notifications.Persistence.csproj", "{B030C414-04CC-4A80-1767-4F8A24BCD8BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications.Core", "Easy.Notifications.Core\Easy.Notifications.Core.csproj", "{284C55D7-3770-46EB-BA37-0EEC57F4F08C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B030C414-04CC-4A80-1767-4F8A24BCD8BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B030C414-04CC-4A80-1767-4F8A24BCD8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B030C414-04CC-4A80-1767-4F8A24BCD8BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{284C55D7-3770-46EB-BA37-0EEC57F4F08C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{284C55D7-3770-46EB-BA37-0EEC57F4F08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{284C55D7-3770-46EB-BA37-0EEC57F4F08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{284C55D7-3770-46EB-BA37-0EEC57F4F08C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

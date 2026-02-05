@@ -8,6 +8,7 @@ namespace Easy.Notifications.Persistence.Entities
     public class NotificationLog
     {
         public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid CorrelationId { get; set; }
         public string Recipient { get; set; } = string.Empty;
         public NotificationChannelType Channel { get; set; }
         public NotificationPriority Priority { get; set; }

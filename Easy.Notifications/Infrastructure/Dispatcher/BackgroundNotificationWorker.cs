@@ -100,6 +100,9 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
 
             foreach (var recipient in payload.Recipients)
             {
+
+                var logEntryId = Guid.NewGuid();
+
                 var provider = providers.FirstOrDefault(p => p.SupportedChannel == recipient.ChannelType);
 
                 if (provider == null)
@@ -111,7 +114,7 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                 // Log as Pending if store is available
                 if (store != null)
                 {
-                    await store.SaveLogAsync(payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody, payload.Priority.ToString());
+                    await store.SaveLogAsync(logEntryId, payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody, payload.Priority.ToString());
                 }
 
                 // Execute the actual dispatch

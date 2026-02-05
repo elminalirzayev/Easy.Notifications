@@ -12,13 +12,14 @@ namespace Easy.Notifications.Core.Abstractions
         /// Creates a pending log entry in the database.
         /// </summary>
         /// <param name="id">The unique notification ID.</param>
+        /// <param name="correlationId">The unique notification ID that links multiple recipients to the same original request.</param>
         /// <param name="recipient">The recipient's address or identifier.</param>
         /// <param name="channel">The channel type as a string.</param>
         /// <param name="subject">The final processed subject.</param>
         /// <param name="body">The final processed body content.</param>
         /// <param name="priority" >The priority level as a string.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        Task SaveLogAsync(Guid id, string recipient, string channel, string subject, string body, string priority);
+        Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority);
 
         /// <summary>
         /// Updates an existing log with the transmission result.
