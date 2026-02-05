@@ -113,4 +113,7 @@
 		<PackageReference Include="Vonage" Version="8.2.0" />
 		<PackageReference Include="System.Text.Json" Version="10.0.2" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Easy.Notifications.Core\Easy.Notifications.Core.csproj" />
+	</ItemGroup>
 </Project>
