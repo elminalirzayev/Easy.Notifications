@@ -24,17 +24,21 @@
 		<AssemblyTitle>Easy.Notifications.Persistence</AssemblyTitle>
 		<AssemblyName>Easy.Notifications.Persistence</AssemblyName>
 		<PackageId>Easy.Notifications.Persistence</PackageId>
-		<Version>1.0.8</Version>
+		<Version>1.0.0</Version>
 		<PackageIcon>icon.png</PackageIcon>
 		<Authors>Elmin Alirzayev</Authors>
 		<Company>Easy Code Tools</Company>
 		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>
-		<Description></Description>
-		<PackageTags>dotnet notification-service email sms whatsapp slack teams telegram signalr sendgrid twilio vonage mailgun smtp background-jobs messaging alerts webhook realtime fluent-api</PackageTags>
-		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications.Persistence</RepositoryUrl>
+		<Description>
+			Entity Framework Core storage implementation for Easy.Notifications.
+			Provides database logging, status tracking, and persistence for retry mechanisms.
+			Compatible with SQL Server and other EF Core providers.
+		</Description>
+		<PackageTags>notification;persistence;entity-framework-core;efcore;sql-server;logging;database;store</PackageTags>
+		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications.Persistence</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>-</PackageReleaseNotes>
 
@@ -82,13 +86,6 @@
 		<PackageReference Include="EntityFramework" Version="6.5.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
 	</ItemGroup>
-	
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="System.Text.Json" Version="10.0.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.32" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.32" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
-	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
 		<PackageReference Include="System.Text.Json" Version="10.0.2" />
@@ -98,7 +95,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Easy.Notifications.Core\Easy.Notifications.Core.csproj" />
+		<ProjectReference Include="..\Easy.Notifications.Core\Easy.Notifications.Core.csproj" />
 	</ItemGroup>
 
 
