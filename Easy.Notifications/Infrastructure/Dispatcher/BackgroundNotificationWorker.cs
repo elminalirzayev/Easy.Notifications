@@ -9,6 +9,7 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
 {
     /// <summary>
     /// Background service that consumes the notification queue and dispatches to providers.
+    /// Supports optional persistence logging if INotificationStore is registered.
     /// </summary>
     public class BackgroundNotificationWorker : BackgroundService
     {
@@ -17,6 +18,9 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
         private readonly ITemplateEngine _templateEngine;
         private readonly ILogger<BackgroundNotificationWorker> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the BackgroundNotificationWorker.
+        /// </summary>
         public BackgroundNotificationWorker(
             Channel<NotificationPayload> channel,
             IServiceProvider serviceProvider,
@@ -29,6 +33,9 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
             _logger = logger;
         }
 
+        /// <summary>
+        /// Core execution loop of the background service.
+        /// </summary>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (await _channel.Reader.WaitToReadAsync(stoppingToken))
@@ -41,40 +48,47 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error processing notification payload.");
+                        _logger.LogError(ex, "Error processing notification payload {Id}", payload.Id);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Processes a single notification payload, manages scopes, and interacts with providers/stores.
+        /// </summary>
         private async Task ProcessPayloadAsync(NotificationPayload payload)
         {
             using var scope = _serviceProvider.CreateScope();
             var providers = scope.ServiceProvider.GetServices<INotificationProvider>();
+            var store = scope.ServiceProvider.GetService<INotificationStore>();
 
             var processedBody = _templateEngine.Process(payload.Body, payload.TemplateData);
             var processedSubject = _templateEngine.Process(payload.Subject, payload.TemplateData);
 
-            // Group recipients by channel type to minimize provider lookups
-            var recipientGroups = payload.Recipients.GroupBy(r => r.ChannelType);
-
-            foreach (var group in recipientGroups)
+            foreach (var recipient in payload.Recipients)
             {
-                var channelType = group.Key;
-
-                // Find the registered provider for this channel type
-                var provider = providers.FirstOrDefault(p => p.SupportedChannel == channelType);
+                var provider = providers.FirstOrDefault(p => p.SupportedChannel == recipient.ChannelType);
 
                 if (provider == null)
                 {
-                    _logger.LogWarning("No provider registered for channel: {Channel}", channelType);
+                    _logger.LogWarning("No provider registered for channel: {Channel}", recipient.ChannelType);
                     continue;
                 }
 
-                foreach (var recipient in group)
+                // Log as Pending if store is available
+                if (store != null)
                 {
-                    // In a production scenario, you might want to execute these in parallel using Task.WhenAll
-                    await provider.SendAsync(recipient, processedSubject, processedBody, payload.Metadata);
+                    await store.SaveLogAsync(payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody);
+                }
+
+                // Execute the actual dispatch
+                var isSuccess = await provider.SendAsync(recipient, processedSubject, processedBody, payload.Metadata);
+
+                // Update status in the database
+                if (store != null)
+                {
+                    await store.UpdateStatusAsync(payload.Id, isSuccess, isSuccess ? null : "Provider delivery failed.");
                 }
             }
         }
