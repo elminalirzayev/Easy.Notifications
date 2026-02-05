@@ -19,7 +19,7 @@ namespace Easy.Notifications.Core.Abstractions
         /// <param name="body">The final processed body content.</param>
         /// <param name="priority" >The priority level as a string.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority);
+        Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority,string? groupId);
 
         /// <summary>
         /// Updates an existing log with the transmission result.
@@ -36,5 +36,17 @@ namespace Easy.Notifications.Core.Abstractions
         /// <param name="maxRetryCount">The maximum allowed retry attempts.</param>
         /// <returns>A list of notification payloads ready to be re-dispatched.</returns>
         Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount);
+
+
+        // INotificationStore.cs içine
+        /// <summary>
+        /// Marks all pending notifications in a group as cancelled.
+        /// </summary>
+        Task CancelGroupAsync(string groupId);
+
+        /// <summary>
+        /// Checks if a specific notification or group has been cancelled.
+        /// </summary>
+        Task<bool> IsCancelledAsync(Guid id, string? groupId = null);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
 using Easy.Notifications.Infrastructure.Dispatcher;
+using Easy.Notifications.Infrastructure.Services;
 using Easy.Notifications.Infrastructure.Templating;
 using Easy.Notifications.Providers.Chat;
 using Easy.Notifications.Providers.Email;
@@ -34,14 +35,18 @@ namespace Easy.Notifications.Extensions
             {
                 channels.Add(priority, Channel.CreateUnbounded<NotificationPayload>());
             }
-
-            // 2. Register the dictionary as a singleton so Dispatcher and Worker can access it
             services.AddSingleton<IDictionary<NotificationPriority, Channel<NotificationPayload>>>(channels);
 
-            // 3. Update Dispatcher to use the priority-aware implementation
+            // 2. Dispatcher Registration
             services.TryAddSingleton<INotificationService, NotificationDispatcher>();
 
-            // 4. Register the background worker that processes priority queues
+            // 3. Register Memory Cache (Required for Hybrid Cancellation)
+            services.AddMemoryCache();
+
+            // 4. Register Cancellation Manager as Singleton
+            services.TryAddSingleton<INotificationCancellationManager, NotificationCancellationManager>();
+
+            // 5. Register Background Worker
             services.AddHostedService<BackgroundNotificationWorker>();
 
             return services;

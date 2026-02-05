@@ -9,6 +9,15 @@ namespace Easy.Notifications.Persistence.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid CorrelationId { get; set; }
+        /// <summary>
+        /// The group identifier for batch operations.
+        /// </summary>
+        public string? GroupId { get; set; } 
+
+        /// <summary>
+        /// Indicates if the notification was cancelled before sending.
+        /// </summary>
+        public bool IsCancelled { get; set; } // <-- İptal özelliği için
         public string Recipient { get; set; } = string.Empty;
         public NotificationChannelType Channel { get; set; }
         public NotificationPriority Priority { get; set; }

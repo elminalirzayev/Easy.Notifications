@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+
 
 #if NETFRAMEWORK
 using System.Data.Entity;
@@ -26,7 +28,7 @@ namespace Easy.Notifications.Persistence.Implementations
         /// <summary>
         /// Records a new notification log. Initial state has RetryCount as 0.
         /// </summary>
-        public async Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body,string priority)
+        public async Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority, string? groupId)
         {
             var channelType = (NotificationChannelType)Enum.Parse(typeof(NotificationChannelType), channel);
             var priorityType = (NotificationPriority)Enum.Parse(typeof(NotificationPriority), priority);
@@ -35,11 +37,12 @@ namespace Easy.Notifications.Persistence.Implementations
             {
                 Id = id,
                 CorrelationId = correlationId,
+                GroupId = groupId,
                 Recipient = recipient,
                 Channel = channelType,
                 Subject = subject,
                 Body = body,
-                Priority= priorityType,
+                Priority = priorityType,
                 IsSuccess = false,
                 RetryCount = 0,
                 CreatedAt = DateTime.UtcNow
@@ -97,6 +100,29 @@ namespace Easy.Notifications.Persistence.Implementations
                         Recipient.Chat(l.Recipient, l.Channel)
                     }
             });
+        }
+
+        public async Task CancelGroupAsync(string groupId)
+        {
+            if (string.IsNullOrWhiteSpace(groupId)) return;
+
+            var pendingLogs = await _context.NotificationLogs
+                .Where(x => x.GroupId == groupId && !x.IsSuccess && !x.IsCancelled)
+                .ToListAsync();
+
+            foreach (var log in pendingLogs)
+            {
+                log.IsCancelled = true;
+                log.ErrorMessage = "Cancelled by user request (Group Cancel).";
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsCancelledAsync(Guid id, string? groupId)
+        {
+            return await _context.NotificationLogs
+                .AnyAsync(x => (x.Id == id || (groupId != null && x.GroupId == groupId)) && x.IsCancelled);
         }
     }
 }

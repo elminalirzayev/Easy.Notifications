@@ -17,28 +17,29 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
         private readonly IServiceProvider _serviceProvider;
         private readonly ITemplateEngine _templateEngine;
         private readonly ILogger<BackgroundNotificationWorker> _logger;
+        private readonly INotificationCancellationManager _cancellationManager; // <-- Yeni
 
         /// <summary>
-        /// Initializes a new instance of the BackgroundNotificationWorker with priority channels.
+        /// Initializes a new instance of the BackgroundNotificationWorker.
         /// </summary>
         public BackgroundNotificationWorker(
             IDictionary<NotificationPriority, Channel<NotificationPayload>> priorityChannels,
             IServiceProvider serviceProvider,
             ITemplateEngine templateEngine,
-            ILogger<BackgroundNotificationWorker> logger)
+            ILogger<BackgroundNotificationWorker> logger,
+            INotificationCancellationManager cancellationManager) // <-- Inject edildi
         {
             _priorityChannels = priorityChannels;
             _serviceProvider = serviceProvider;
             _templateEngine = templateEngine;
             _logger = logger;
+            _cancellationManager = cancellationManager;
         }
-
         /// <summary>
         /// Core execution loop that monitors all priority channels.
         /// </summary>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // We define the order of processing explicitly
             var priorityOrder = new[]
             {
                 NotificationPriority.Urgent,
@@ -51,21 +52,16 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
             {
                 bool processedAny = false;
 
-                // Scan channels from highest to lowest priority
                 foreach (var priority in priorityOrder)
                 {
                     if (_priorityChannels.TryGetValue(priority, out var channel))
                     {
-                        // Try to process one message from the current channel
                         if (channel.Reader.TryRead(out var payload))
                         {
                             try
                             {
                                 await ProcessPayloadAsync(payload);
                                 processedAny = true;
-                                // After processing a high priority message, 
-                                // we immediately jump back to the start of the loop 
-                                // to ensure the next message processed is also the highest possible priority.
                                 break;
                             }
                             catch (Exception ex)
@@ -76,11 +72,8 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                     }
                 }
 
-                // If no channels had any messages, wait for any channel to have data to avoid 100% CPU usage
                 if (!processedAny)
                 {
-                    // Wait for the Normal channel as a baseline, or use a small Task.Delay
-                    // A better approach is to WaitToReadAsync on all channels, but for simplicity:
                     await Task.Delay(100, stoppingToken);
                 }
             }
@@ -91,6 +84,34 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
         /// </summary>
         private async Task ProcessPayloadAsync(NotificationPayload payload)
         {
+            if (_cancellationManager.IsGroupCancelled(payload.GroupId))
+            {
+                _logger.LogInformation("Notification {Id} skipped because group {Group} is cancelled (Memory Check).", payload.Id, payload.GroupId);
+
+                using var cancelScope = _serviceProvider.CreateScope();
+                var cancelStore = cancelScope.ServiceProvider.GetService<INotificationStore>();
+
+                if (cancelStore != null)
+                {
+                    foreach (var recipient in payload.Recipients)
+                    {
+                        var logId = Guid.NewGuid();
+                        await cancelStore.SaveLogAsync(
+                            logId,
+                            payload.Id,
+                            recipient.Value,
+                            recipient.ChannelType.ToString(),
+                            payload.Subject, 
+                            payload.Body,   
+                            payload.Priority.ToString(),
+                            payload.GroupId);
+
+                        await cancelStore.UpdateStatusAsync(logId, false, "Cancelled by Group Request (Pre-check).");
+                    }
+                }
+                return; 
+            }
+
             using var scope = _serviceProvider.CreateScope();
             var providers = scope.ServiceProvider.GetServices<INotificationProvider>();
             var store = scope.ServiceProvider.GetService<INotificationStore>();
@@ -100,9 +121,7 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
 
             foreach (var recipient in payload.Recipients)
             {
-
                 var logEntryId = Guid.NewGuid();
-
                 var provider = providers.FirstOrDefault(p => p.SupportedChannel == recipient.ChannelType);
 
                 if (provider == null)
@@ -111,19 +130,16 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                     continue;
                 }
 
-                // Log as Pending if store is available
                 if (store != null)
                 {
-                    await store.SaveLogAsync(logEntryId, payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody, payload.Priority.ToString());
+                    await store.SaveLogAsync(logEntryId, payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody, payload.Priority.ToString(), payload.GroupId);
                 }
 
-                // Execute the actual dispatch
                 var isSuccess = await provider.SendAsync(recipient, processedSubject, processedBody, payload.Metadata);
 
-                // Update status in the database
                 if (store != null)
                 {
-                    await store.UpdateStatusAsync(payload.Id, isSuccess, isSuccess ? null : "Provider delivery failed.");
+                    await store.UpdateStatusAsync(logEntryId, isSuccess, isSuccess ? null : "Provider delivery failed.");
                 }
             }
         }

@@ -13,6 +13,11 @@
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
+        /// Optional Group ID to link related notifications (e.g., CampaignId or BatchId).
+        /// </summary>
+        public string? GroupId { get; set; }
+
+        /// <summary>
         /// Gets or sets the priority level. Defaults to Normal.
         /// </summary>
         public NotificationPriority Priority { get; set; } = NotificationPriority.Normal;
