@@ -1,5 +1,6 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
+using Easy.Notifications.Core.Models.Reporting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,8 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
         private readonly IServiceProvider _serviceProvider;
         private readonly ITemplateEngine _templateEngine;
         private readonly ILogger<BackgroundNotificationWorker> _logger;
-        private readonly INotificationCancellationManager _cancellationManager; // <-- Yeni
+        private readonly INotificationCancellationManager _cancellationManager;
+        private readonly INotificationLiveMonitor _liveMonitor;
 
         /// <summary>
         /// Initializes a new instance of the BackgroundNotificationWorker.
@@ -27,13 +29,15 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
             IServiceProvider serviceProvider,
             ITemplateEngine templateEngine,
             ILogger<BackgroundNotificationWorker> logger,
-            INotificationCancellationManager cancellationManager) // <-- Inject edildi
+            INotificationCancellationManager cancellationManager,
+            INotificationLiveMonitor liveMonitor)
         {
             _priorityChannels = priorityChannels;
             _serviceProvider = serviceProvider;
             _templateEngine = templateEngine;
             _logger = logger;
             _cancellationManager = cancellationManager;
+            _liveMonitor = liveMonitor;
         }
         /// <summary>
         /// Core execution loop that monitors all priority channels.
@@ -140,6 +144,21 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                 if (store != null)
                 {
                     await store.UpdateStatusAsync(logEntryId, isSuccess, isSuccess ? null : "Provider delivery failed.");
+                }
+
+                if (_liveMonitor != null)
+                {
+                    await _liveMonitor.PublishUpdateAsync(new LiveNotificationDto
+                    {
+                        Id = logEntryId, 
+                        Recipient = recipient.Value,
+                        Channel = recipient.ChannelType.ToString(),
+                        Subject = payload.Subject, 
+                        IsSuccess = isSuccess,
+                        ErrorMessage = isSuccess ? null : "Provider delivery failed.", 
+                        Timestamp = DateTime.UtcNow,
+                        GroupId = payload.GroupId
+                    });
                 }
             }
         }

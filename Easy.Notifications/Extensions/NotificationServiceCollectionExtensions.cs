@@ -45,8 +45,11 @@ namespace Easy.Notifications.Extensions
 
             // 4. Register Cancellation Manager as Singleton
             services.TryAddSingleton<INotificationCancellationManager, NotificationCancellationManager>();
+            
+            //5. Register No-Op Live Monitor as Singleton
+            services.TryAddSingleton<INotificationLiveMonitor, NoOpLiveMonitor>();
 
-            // 5. Register Background Worker
+            // 6. Register Background Worker
             services.AddHostedService<BackgroundNotificationWorker>();
 
             return services;
