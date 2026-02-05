@@ -16,8 +16,9 @@ namespace Easy.Notifications.Core.Abstractions
         /// <param name="channel">The channel type as a string.</param>
         /// <param name="subject">The final processed subject.</param>
         /// <param name="body">The final processed body content.</param>
+        /// <param name="priority" >The priority level as a string.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        Task SaveLogAsync(Guid id, string recipient, string channel, string subject, string body);
+        Task SaveLogAsync(Guid id, string recipient, string channel, string subject, string body, string priority);
 
         /// <summary>
         /// Updates an existing log with the transmission result.

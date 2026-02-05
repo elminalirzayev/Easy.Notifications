@@ -8,48 +8,80 @@ using System.Threading.Channels;
 namespace Easy.Notifications.Infrastructure.Dispatcher
 {
     /// <summary>
-    /// Background service that consumes the notification queue and dispatches to providers.
-    /// Supports optional persistence logging if INotificationStore is registered.
+    /// Background service that consumes prioritized notification queues and dispatches to providers.
+    /// Processes channels in order: Urgent > High > Normal > Low.
     /// </summary>
     public class BackgroundNotificationWorker : BackgroundService
     {
-        private readonly Channel<NotificationPayload> _channel;
+        private readonly IDictionary<NotificationPriority, Channel<NotificationPayload>> _priorityChannels;
         private readonly IServiceProvider _serviceProvider;
         private readonly ITemplateEngine _templateEngine;
         private readonly ILogger<BackgroundNotificationWorker> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the BackgroundNotificationWorker.
+        /// Initializes a new instance of the BackgroundNotificationWorker with priority channels.
         /// </summary>
         public BackgroundNotificationWorker(
-            Channel<NotificationPayload> channel,
+            IDictionary<NotificationPriority, Channel<NotificationPayload>> priorityChannels,
             IServiceProvider serviceProvider,
             ITemplateEngine templateEngine,
             ILogger<BackgroundNotificationWorker> logger)
         {
-            _channel = channel;
+            _priorityChannels = priorityChannels;
             _serviceProvider = serviceProvider;
             _templateEngine = templateEngine;
             _logger = logger;
         }
 
         /// <summary>
-        /// Core execution loop of the background service.
+        /// Core execution loop that monitors all priority channels.
         /// </summary>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (await _channel.Reader.WaitToReadAsync(stoppingToken))
+            // We define the order of processing explicitly
+            var priorityOrder = new[]
             {
-                while (_channel.Reader.TryRead(out var payload))
+                NotificationPriority.Urgent,
+                NotificationPriority.High,
+                NotificationPriority.Normal,
+                NotificationPriority.Low
+            };
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                bool processedAny = false;
+
+                // Scan channels from highest to lowest priority
+                foreach (var priority in priorityOrder)
                 {
-                    try
+                    if (_priorityChannels.TryGetValue(priority, out var channel))
                     {
-                        await ProcessPayloadAsync(payload);
+                        // Try to process one message from the current channel
+                        if (channel.Reader.TryRead(out var payload))
+                        {
+                            try
+                            {
+                                await ProcessPayloadAsync(payload);
+                                processedAny = true;
+                                // After processing a high priority message, 
+                                // we immediately jump back to the start of the loop 
+                                // to ensure the next message processed is also the highest possible priority.
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error processing notification payload {Id} from {Priority} queue.", payload.Id, priority);
+                            }
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error processing notification payload {Id}", payload.Id);
-                    }
+                }
+
+                // If no channels had any messages, wait for any channel to have data to avoid 100% CPU usage
+                if (!processedAny)
+                {
+                    // Wait for the Normal channel as a baseline, or use a small Task.Delay
+                    // A better approach is to WaitToReadAsync on all channels, but for simplicity:
+                    await Task.Delay(100, stoppingToken);
                 }
             }
         }
@@ -79,7 +111,7 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                 // Log as Pending if store is available
                 if (store != null)
                 {
-                    await store.SaveLogAsync(payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody);
+                    await store.SaveLogAsync(payload.Id, recipient.Value, recipient.ChannelType.ToString(), processedSubject, processedBody, payload.Priority.ToString());
                 }
 
                 // Execute the actual dispatch

@@ -10,6 +10,7 @@ namespace Easy.Notifications.Persistence.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Recipient { get; set; } = string.Empty;
         public NotificationChannelType Channel { get; set; }
+        public NotificationPriority Priority { get; set; }
         public string? Subject { get; set; }
         public string Body { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
