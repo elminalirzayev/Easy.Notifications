@@ -1,15 +1,6 @@
-﻿using Easy.Notifications.Persistence.Entities;
+﻿using Easy.Notifications.EntityFrameworkCore.Entities;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-
-<<<<<<< TODO: Unmerged change from project 'Easy.Notifications.EntityFrameworkCore (net6.0)', Before:
-=======
-using Easy;
-using Easy.Notifications;
-using Easy.Notifications.Persistence;
-using Easy.Notifications.EntityFrameworkCore;
->>>>>>> After
-
 
 
 #if !NETFRAMEWORK

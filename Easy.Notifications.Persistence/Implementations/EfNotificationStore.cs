@@ -1,6 +1,6 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
-using Easy.Notifications.Persistence.Entities;
+using Easy.Notifications.EntityFrameworkCore.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
