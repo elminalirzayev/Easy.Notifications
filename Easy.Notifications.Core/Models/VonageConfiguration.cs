@@ -7,4 +7,4 @@
         public string Sender { get; set; } = string.Empty;
         public string FromNumber { get; set; } = string.Empty;
     }
-    }
+}

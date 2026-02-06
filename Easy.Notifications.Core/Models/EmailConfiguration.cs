@@ -10,4 +10,4 @@
         public string SenderDisplayName { get; set; } = string.Empty;
         public bool EnableSsl { get; set; } = true;
     }
-    }
+}

@@ -45,7 +45,7 @@ namespace Easy.Notifications.Extensions
 
             // 4. Register Cancellation Manager as Singleton
             services.TryAddSingleton<INotificationCancellationManager, NotificationCancellationManager>();
-            
+
             //5. Register No-Op Live Monitor as Singleton
             services.TryAddSingleton<INotificationLiveMonitor, NoOpLiveMonitor>();
 
