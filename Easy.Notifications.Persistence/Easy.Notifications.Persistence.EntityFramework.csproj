@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>		
+	<PropertyGroup>
 
 		<!-- Package Info -->
 		<Title>Easy.Notifications.Persistence.EntityFramework</Title>
@@ -17,6 +17,17 @@
 		<PackageReleaseNotes>-</PackageReleaseNotes>
 
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="README.md">
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="icon.png">
+			<Pack>true</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0'">
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
