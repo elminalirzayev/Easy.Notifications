@@ -2,12 +2,22 @@
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
+<<<<<<< TODO: Unmerged change from project 'Easy.Notifications.EntityFrameworkCore (net6.0)', Before:
+=======
+using Easy;
+using Easy.Notifications;
+using Easy.Notifications.Persistence;
+using Easy.Notifications.EntityFrameworkCore;
+>>>>>>> After
+
+
+
 #if !NETFRAMEWORK
 using Microsoft.EntityFrameworkCore;
 #else
 using System.Data.Entity;
 #endif
-namespace Easy.Notifications.Persistence
+namespace Easy.Notifications.EntityFrameworkCore
 {
     /// <summary>
     /// Multi-framework database context for storing notification history.

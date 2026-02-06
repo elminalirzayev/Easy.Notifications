@@ -1,23 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;netstandard2.1;net48;net47;</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
-
-		<!-- Deterministic + SourceLink -->
-		<Deterministic>true</Deterministic>
-		<DebugType>portable</DebugType>
-		<EmbedAllSources>true</EmbedAllSources>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<EnableSourceLink>true</EnableSourceLink>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
-		<IncludeSource>true</IncludeSource>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		
 
 		<!-- Package Info -->
 		<Title>Easy.Notifications.Infrastructure</Title>
@@ -25,10 +9,6 @@
 		<AssemblyName>Easy.Notifications.Infrastructure</AssemblyName>
 		<PackageId>Easy.Notifications.Infrastructure</PackageId>
 		<Version>1.0.0</Version>
-		<PackageIcon>icon.png</PackageIcon>
-		<Authors>Elmin Alirzayev</Authors>
-		<Company>Easy Code Tools</Company>
-		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>
 		<Description>
 			A robust, multi-channel notification library for .NET.
 			Features:
@@ -38,21 +18,9 @@
 			- Monitoring: Real-time tracking via SignalR and Dashboard reporting.
 			- Management: Group-based cancellation (Campaigns).
 		</Description>
-
 		<PackageTags>notification;email;sms;slack;teams;telegram;twilio;sendgrid;background-service;priority-queue;retry;resilience;signalr</PackageTags>
-		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>-</PackageReleaseNotes>
 
-		<!-- Build -->
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 	</PropertyGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0'">

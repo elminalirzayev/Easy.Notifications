@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Easy.Notifications.EntityFrameworkCore;
+
+
 
 
 #if NETFRAMEWORK
@@ -14,7 +17,7 @@ using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 #endif
 
-namespace Easy.Notifications.Persistence.Implementations
+namespace Easy.Notifications.EntityFrameworkCore.Implementations
 {
     public class EfNotificationStore : INotificationStore
     {

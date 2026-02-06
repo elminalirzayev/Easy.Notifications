@@ -51,7 +51,7 @@ The library separates the **Dispatching** logic from the **Processing** logic to
     
 
 
-## 📦 Installation
+## Installation
 
 Install via NuGet Package Manager:
 

@@ -5,7 +5,7 @@ VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications", "Easy.Notifications\Easy.Notifications.csproj", "{741609D1-79F4-4FA4-84E5-4EA538838481}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications.Persistence", "Easy.Notifications.Persistence\Easy.Notifications.Persistence.csproj", "{B030C414-04CC-4A80-1767-4F8A24BCD8BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications.EntityFrameworkCore", "Easy.Notifications.Persistence\Easy.Notifications.EntityFrameworkCore.csproj", "{B030C414-04CC-4A80-1767-4F8A24BCD8BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.Notifications.Core", "Easy.Notifications.Core\Easy.Notifications.Core.csproj", "{284C55D7-3770-46EB-BA37-0EEC57F4F08C}"
 EndProject

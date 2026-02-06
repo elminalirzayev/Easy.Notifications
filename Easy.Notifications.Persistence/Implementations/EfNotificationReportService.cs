@@ -4,13 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Easy.Notifications.EntityFrameworkCore;
+
+
 
 #if NETFRAMEWORK
 using System.Data.Entity;
 #else
 using Microsoft.EntityFrameworkCore;
 #endif
-namespace Easy.Notifications.Persistence.Implementations
+namespace Easy.Notifications.EntityFrameworkCore.Implementations
 {
     public class EfNotificationReportService : INotificationReportService
     {

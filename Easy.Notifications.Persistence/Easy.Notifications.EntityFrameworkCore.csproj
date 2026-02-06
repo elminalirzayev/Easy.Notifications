@@ -1,33 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;netstandard2.1;net48;net47;</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
-
-		<!-- Deterministic + SourceLink -->
-		<Deterministic>true</Deterministic>
-		<DebugType>portable</DebugType>
-		<EmbedAllSources>true</EmbedAllSources>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<EnableSourceLink>true</EnableSourceLink>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
-		<IncludeSource>true</IncludeSource>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	<PropertyGroup>		
 
 		<!-- Package Info -->
-		<Title>Easy.Notifications.Persistence</Title>
-		<AssemblyTitle>Easy.Notifications.Persistence</AssemblyTitle>
-		<AssemblyName>Easy.Notifications.Persistence</AssemblyName>
-		<PackageId>Easy.Notifications.Persistence</PackageId>
+		<Title>Easy.Notifications.EntityFrameworkCore</Title>
+		<AssemblyTitle>Easy.Notifications.EntityFrameworkCore</AssemblyTitle>
+		<AssemblyName>Easy.Notifications.EntityFrameworkCore</AssemblyName>
+		<PackageId>Easy.Notifications.EntityFrameworkCore</PackageId>
 		<Version>1.0.0</Version>
-		<PackageIcon>icon.png</PackageIcon>
-		<Authors>Elmin Alirzayev</Authors>
-		<Company>Easy Code Tools</Company>
 		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>
 		<Description>
 			Entity Framework Core storage implementation for Easy.Notifications.
@@ -35,20 +15,7 @@
 			Compatible with SQL Server and other EF Core providers.
 		</Description>
 		<PackageTags>notification;persistence;entity-framework-core;efcore;sql-server;logging;database;store</PackageTags>
-		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>-</PackageReleaseNotes>
-
-		<!-- Build -->
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-
 
 	</PropertyGroup>
 

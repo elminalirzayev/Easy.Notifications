@@ -1,6 +1,6 @@
 ﻿using Easy.Notifications.Core.Models;
 
-namespace Easy.Notifications.Persistence.Entities
+namespace Easy.Notifications.EntityFrameworkCore.Entities
 {
     /// <summary>
     /// Represents a persistent record of a sent notification with retry capabilities.

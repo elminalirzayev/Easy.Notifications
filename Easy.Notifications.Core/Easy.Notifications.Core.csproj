@@ -1,23 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;netstandard2.1;net48;net47;</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
-
-		<!-- Deterministic + SourceLink -->
-		<Deterministic>true</Deterministic>
-		<DebugType>portable</DebugType>
-		<EmbedAllSources>true</EmbedAllSources>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<EnableSourceLink>true</EnableSourceLink>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
-		<IncludeSource>true</IncludeSource>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 
 		<!-- Package Info -->
 		<Title>Easy.Notifications.Core</Title>
@@ -25,29 +8,14 @@
 		<AssemblyName>Easy.Notifications.Core</AssemblyName>
 		<PackageId>Easy.Notifications.Core</PackageId>
 		<Version>1.0.0</Version>
-		<PackageIcon>icon.png</PackageIcon>
-		<Authors>Elmin Alirzayev</Authors>
-		<Company>Easy Code Tools</Company>
-		<Copyright>Copyright © Elmin Alirzayev 2025</Copyright>
 		<Description>
 			The core abstractions, models, and interfaces for the Easy.Notifications.Core library.
 			Includes definitions for NotificationPayload, INotificationService, and supported channel types.
 			Install this package if you only need the contracts without the implementation.
 		</Description>
 		<PackageTags>notification;core;abstractions;interfaces;models;clean-architecture</PackageTags>
-		<RepositoryUrl>https://github.com/elminalirzayev/Easy.Notifications</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/elminalirzayev/Easy.Notifications</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>-</PackageReleaseNotes>
 
-		<!-- Build -->
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 
 	</PropertyGroup>
 </Project>
