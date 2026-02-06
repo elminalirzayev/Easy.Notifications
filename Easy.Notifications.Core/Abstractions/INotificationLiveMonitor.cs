@@ -1,5 +1,4 @@
 ﻿using Easy.Notifications.Core.Models.Reporting;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Core.Abstractions
 {

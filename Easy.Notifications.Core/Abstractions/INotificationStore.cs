@@ -1,4 +1,8 @@
 ﻿using Easy.Notifications.Core.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Easy.Notifications.Core.Abstractions
 {
@@ -12,15 +16,25 @@ namespace Easy.Notifications.Core.Abstractions
         /// Creates a pending log entry in the database.
         /// </summary>
         /// <param name="id">The unique notification ID.</param>
-        /// <param name="correlationId">The unique notification ID that links multiple recipients to the same original request.</param>
+        /// <param name="correlationId">The unique ID linking multiple recipients to the same request.</param>
         /// <param name="recipient">The recipient's address or identifier.</param>
-        /// <param name="channel">The channel type as a string.</param>
+        /// <param name="channel">The channel type (Email, Sms, etc.) as a string.</param>
         /// <param name="subject">The final processed subject.</param>
         /// <param name="body">The final processed body content.</param>
-        /// <param name="priority">The priority level as a string.</param>
-        /// <param name="groupId"> Optional group identifier for batch notifications.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority,string? groupId);
+        /// <param name="priority">The priority level (Urgent, Normal, etc.) as a string.</param>
+        /// <param name="groupId">Optional group identifier for batch notifications (Campaigns).</param>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous save operation.</returns>
+        Task SaveLogAsync(
+            Guid id,
+            Guid correlationId,
+            string recipient,
+            string channel,
+            string subject,
+            string body,
+            string priority,
+            string? groupId,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates an existing log with the transmission result.
@@ -28,26 +42,33 @@ namespace Easy.Notifications.Core.Abstractions
         /// <param name="id">The unique notification ID to update.</param>
         /// <param name="isSuccess">Indicates whether the provider successfully sent the message.</param>
         /// <param name="errorMessage">Detailed error message if the operation failed.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        Task UpdateStatusAsync(Guid id, bool isSuccess, string? errorMessage = null);
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous update operation.</returns>
+        Task UpdateStatusAsync(Guid id, bool isSuccess, string? errorMessage = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves notifications that failed and are scheduled for a retry.
         /// </summary>
         /// <param name="maxRetryCount">The maximum allowed retry attempts.</param>
-        /// <returns>A list of notification payloads ready to be re-dispatched.</returns>
-        Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount);
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A collection of notification payloads ready to be re-dispatched.</returns>
+        Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount, CancellationToken cancellationToken = default);
 
-
-        // INotificationStore.cs içine
         /// <summary>
         /// Marks all pending notifications in a group as cancelled.
         /// </summary>
-        Task CancelGroupAsync(string groupId);
+        /// <param name="groupId">The unique identifier of the group/campaign.</param>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous cancellation operation.</returns>
+        Task CancelGroupAsync(string groupId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if a specific notification or group has been cancelled.
         /// </summary>
-        Task<bool> IsCancelledAsync(Guid id, string? groupId = null);
+        /// <param name="id">The notification ID.</param>
+        /// <param name="groupId">The optional group ID.</param>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>True if the notification is marked as cancelled; otherwise, false.</returns>
+        Task<bool> IsCancelledAsync(Guid id, string? groupId = null, CancellationToken cancellationToken = default);
     }
 }

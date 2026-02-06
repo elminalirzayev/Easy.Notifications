@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using System;
-
-namespace Easy.Notifications.Core.Abstractions
+﻿namespace Easy.Notifications.Core.Abstractions
 {
     /// <summary>
     /// Manages cancellation requests for notification groups using a hybrid approach (Memory + Persistence).
