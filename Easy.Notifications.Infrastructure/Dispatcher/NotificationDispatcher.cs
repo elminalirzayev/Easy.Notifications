@@ -1,8 +1,6 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models;
-using System.Collections.Generic;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Infrastructure.Dispatcher
 {

@@ -26,21 +26,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
         {
             _context = context;
         }
-
-        /// <summary>
-        /// Records a new notification log into the database. 
-        /// The initial state is set to Failed/Pending with a RetryCount of 0.
-        /// </summary>
-        /// <param name="id">The unique identifier of the notification.</param>
-        /// <param name="correlationId">The correlation ID for tracking.</param>
-        /// <param name="recipient">The recipient address (email, phone, webhook url).</param>
-        /// <param name="channel">The channel type as a string (Email, Sms, etc.).</param>
-        /// <param name="subject">The notification subject.</param>
-        /// <param name="body">The notification body content.</param>
-        /// <param name="priority">The priority level as a string.</param>
-        /// <param name="groupId">The optional group/campaign ID.</param>
-        /// <returns>A task that represents the asynchronous save operation.</returns>
-        public async Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority, string? groupId)
+        public async Task SaveLogAsync(Guid id, Guid correlationId, string recipient, string channel, string subject, string body, string priority, string? groupId, CancellationToken cancellationToken = default)
         {
             // Note: Ensure input strings match Enum names exactly, or this will throw.
             var channelType = (NotificationChannelType)Enum.Parse(typeof(NotificationChannelType), channel);
@@ -65,15 +51,8 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Updates the status of a notification log after a delivery attempt.
-        /// If delivery failed, it increments the retry count and schedules the next retry.
-        /// </summary>
-        /// <param name="id">The unique identifier of the notification.</param>
-        /// <param name="isSuccess">True if sent successfully; otherwise, false.</param>
-        /// <param name="errorMessage">The error message provider if failed.</param>
-        /// <returns>A task that represents the asynchronous update operation.</returns>
-        public async Task UpdateStatusAsync(Guid id, bool isSuccess, string? errorMessage = null)
+
+        public async Task UpdateStatusAsync(Guid id, bool isSuccess, string? errorMessage = null, CancellationToken cancellationToken = default)
         {
             var log = await _context.NotificationLogs.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -96,12 +75,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             }
         }
 
-        /// <summary>
-        /// Fetches failed logs that are eligible for a retry and maps them back to the payload model.
-        /// </summary>
-        /// <param name="maxRetryCount">The maximum number of retries allowed before giving up.</param>
-        /// <returns>A collection of <see cref="NotificationPayload"/> ready to be re-queued.</returns>
-        public async Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount)
+        public async Task<IEnumerable<NotificationPayload>> GetPendingRetriesAsync(int maxRetryCount, CancellationToken cancellationToken = default)
         {
             var now = DateTime.UtcNow;
 
@@ -127,12 +101,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             });
         }
 
-        /// <summary>
-        /// Cancels all pending notifications for a specific group (e.g., a Campaign).
-        /// </summary>
-        /// <param name="groupId">The group identifier to cancel.</param>
-        /// <returns>A task that represents the asynchronous cancellation operation.</returns>
-        public async Task CancelGroupAsync(string groupId)
+        public async Task CancelGroupAsync(string groupId, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(groupId)) return;
 
@@ -149,13 +118,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Checks if a specific notification or its group has been cancelled.
-        /// </summary>
-        /// <param name="id">The notification ID.</param>
-        /// <param name="groupId">The optional group ID.</param>
-        /// <returns>True if the notification is marked as cancelled; otherwise, false.</returns>
-        public async Task<bool> IsCancelledAsync(Guid id, string? groupId)
+        public async Task<bool> IsCancelledAsync(Guid id, string? groupId, CancellationToken cancellationToken = default)
         {
             return await _context.NotificationLogs
                 .AnyAsync(x => (x.Id == id || (groupId != null && x.GroupId == groupId)) && x.IsCancelled);

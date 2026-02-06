@@ -86,7 +86,7 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
         /// <summary>
         /// Processes a single notification payload, manages scopes, and interacts with providers/stores.
         /// </summary>
-        private async Task ProcessPayloadAsync(NotificationPayload payload)
+        private async Task ProcessPayloadAsync(NotificationPayload payload, CancellationToken cancellationToken = default)
         {
             if (_cancellationManager.IsGroupCancelled(payload.GroupId))
             {
@@ -105,15 +105,16 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                             payload.Id,
                             recipient.Value,
                             recipient.ChannelType.ToString(),
-                            payload.Subject, 
-                            payload.Body,   
+                            payload.Subject,
+                            payload.Body,
                             payload.Priority.ToString(),
-                            payload.GroupId);
+                            payload.GroupId,
+                            cancellationToken);
 
                         await cancelStore.UpdateStatusAsync(logId, false, "Cancelled by Group Request (Pre-check).");
                     }
                 }
-                return; 
+                return;
             }
 
             using var scope = _serviceProvider.CreateScope();
@@ -150,12 +151,12 @@ namespace Easy.Notifications.Infrastructure.Dispatcher
                 {
                     await _liveMonitor.PublishUpdateAsync(new LiveNotificationDto
                     {
-                        Id = logEntryId, 
+                        Id = logEntryId,
                         Recipient = recipient.Value,
                         Channel = recipient.ChannelType.ToString(),
-                        Subject = payload.Subject, 
+                        Subject = payload.Subject,
                         IsSuccess = isSuccess,
-                        ErrorMessage = isSuccess ? null : "Provider delivery failed.", 
+                        ErrorMessage = isSuccess ? null : "Provider delivery failed.",
                         Timestamp = DateTime.UtcNow,
                         GroupId = payload.GroupId
                     });

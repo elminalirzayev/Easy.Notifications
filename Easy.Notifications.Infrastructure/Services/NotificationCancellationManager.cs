@@ -1,8 +1,6 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace Easy.Notifications.Infrastructure.Services
 {

@@ -22,7 +22,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<DashboardSummaryDto> GetSummaryAsync(DateTime startDate, DateTime endDate)
+        public async Task<DashboardSummaryDto> GetSummaryAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
         {
             var query = _context.NotificationLogs
                 .AsNoTracking()
@@ -74,7 +74,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             };
         }
 
-        public async Task<List<DailyTrendDto>> GetDailyTrendsAsync(int lastDays = 7)
+        public async Task<IEnumerable<DailyTrendDto>> GetDailyTrendsAsync(int lastDays = 7, CancellationToken cancellationToken = default)
         {
             var startDate = DateTime.UtcNow.Date.AddDays(-lastDays);
 
@@ -94,7 +94,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             return data;
         }
 
-        public async Task<DashboardSummaryDto> GetGroupStatsAsync(string groupId)
+        public async Task<DashboardSummaryDto> GetGroupStatsAsync(string groupId, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(groupId))
                 return new DashboardSummaryDto();

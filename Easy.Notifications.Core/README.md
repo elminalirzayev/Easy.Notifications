@@ -120,8 +120,7 @@ This package is part of a modular notification system:
 | --- | --- |
 | **`Easy.Notifications.Core`** | **(You are here)** Abstractions, Interfaces, and Models. |
 | **`Easy.Notifications`** | The main engine. Includes Background Worker, Retry logic, Dispatcher, and default providers (SMTP, Twilio, etc.). |
-| **`Easy.Notifications.EntityFrameworkCore`** | Persistence layer for logging, status tracking, and retry mechanisms using EF Core. |
-| **`Easy.Notifications.EntityFrameworkCore`** | Persistence layer for logging, status tracking, and retry mechanisms using EF Core. |
+| **`Easy.Notifications.Persistence.EntityFramework`** | Persistence layer for logging, status tracking, and retry mechanisms using EF Core. |
 
 ___
 
