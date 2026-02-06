@@ -12,37 +12,52 @@
 
 It is designed for enterprise applications that require **Reliable Dispatching** without blocking the main execution thread. It combines **System.Threading.Channels**, **Priority Queues**, and **Hybrid Persistence** to ensure your messages (Email, SMS, Chat) are delivered safely, even under heavy load.
 
-## 🚀 Features
+## Features
 
--   ** Fire-and-Forget Architecture:** Uses in-memory channels to offload sending logic instantly.
--   ** Priority Queues:** Process `Urgent` messages (e.g., OTPs, Alerts) before `Normal` newsletters.
--   ** Resilience & Retries:** Automatic retry mechanism with exponential backoff for failed providers.
--   ** Hybrid Cancellation:** Cancel millions of pending campaign messages instantly using a Memory+DB hybrid lock.
--   ** Live Monitoring:** Real-time hooks for SignalR to watch notification traffic as it happens.
--   ** Audit Logging:** (Optional) Persist every attempt, success, and failure to SQL Server using the persistence package.
--   ** Built-in Templating:** Lightweight template engine for dynamic content (`Hello {{Name}}`).
--   ** Modular Architecture:** Add only the providers you need via Dependency Injection.
--   ** Multi-Channel Support:**
+-   **Fire-and-Forget Architecture:** Uses in-memory channels to offload sending logic instantly, ensuring zero-latency for the producer.
+    
+-   **Priority Queues:** Process `Urgent` messages (e.g., OTPs, Alerts) immediately, bypassing `Normal` or `Low` priority marketing queues.
+    
+-   **Resilience & Retries:** Automatic retry mechanism with exponential backoff for failed providers (requires Persistence package).
+    
+-   **Hybrid Cancellation:** Cancel millions of pending campaign messages instantly using a smart **Memory + DB hybrid lock** mechanism.
+    
+-   **Live Monitoring:** Real-time hooks for SignalR to watch notification traffic (Success/Fail) as it happens.
+    
+-   **Audit Logging:** (Optional) Persist every attempt, success, and failure to SQL Server using the `EntityFramework` package.
+    
+-   **Built-in Templating:** Lightweight template engine for dynamic content replacement (e.g., `Hello {{Name}}`).
+    
+-   **Modular Architecture:** Designed with Dependency Injection in mind; add only the providers you need.
+    
+-   **Multi-Channel Support:**
+    
     -   **Email:** SMTP, SendGrid, Mailgun.
+        
     -   **SMS/WhatsApp:** Twilio, Vonage.
-    -   **Chat:** Slack (Block Kit), Teams (Adaptive Cards), Telegram.
+        
+    -   **Chat:** Slack (Block Kit), Microsoft Teams (Message Cards), Telegram.
+        
     -   **Realtime:** SignalR (WebSockets).
--   ** Rich Content Support:**
+        
+-   **Rich Content Support:**
+    
     -   Automatically converts messages to **Slack Block Kit** structures.
-    -   Renders **Microsoft Teams Message Cards** with custom colors and sections.   
+        
+    -   Renders **Microsoft Teams Message Cards** with custom colors and sections via Metadata.  
       
-##  Architecture
+## Architecture
 
 The library separates the **Dispatching** logic from the **Processing** logic to ensure maximum throughput.
 
-1.  **Producer:** Your Controller calls `INotificationService.SendAsync()`.
+1.  **Producer:** Your Application (API/Service) calls `INotificationService.SendAsync()`.
     
-2.  **Dispatcher:** The payload is instantly written to a memory channel. Control returns to your code in microseconds.
+2.  **Dispatcher:** The payload is instantly written to the appropriate **Priority Channel** (Memory). Control returns to your code in microseconds.
     
-3.  **Worker:** A background service (`BackgroundNotificationWorker`) reads from the channel.
+3.  **Worker:** A background service (`BackgroundNotificationWorker`) consumes messages, strictly processing **Urgent** items before **Normal** ones.
     
-4.  **Provider:** The specific provider (e.g., `SlackProvider`, `SmtpEmailProvider`) executes the external API call safely.
-  
+4.  **Provider:** The specific provider (e.g., `SlackProvider`, `SmtpEmailProvider`) executes the external API call. Failures are handled by the **Retry Mechanism**.
+
 
 ## Installation
 
