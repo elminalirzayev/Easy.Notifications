@@ -1,9 +1,5 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Easy.Notifications.Core.Models.Reporting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 #if NETFRAMEWORK
 using System.Data.Entity;

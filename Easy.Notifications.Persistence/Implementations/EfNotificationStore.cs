@@ -122,7 +122,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
                 GroupId = l.GroupId,
                 Recipients = new List<Recipient>
                 {
-                    new Recipient(l.Recipient, string.Empty, l.Channel)
+                    new Recipient(l.Recipient, l.Channel,string.Empty)
                 }
             });
         }

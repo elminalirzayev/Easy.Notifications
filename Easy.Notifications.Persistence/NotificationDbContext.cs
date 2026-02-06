@@ -1,5 +1,4 @@
-﻿using Easy.Notifications.Persistence.EntityFramework.Entities; // Namespace fixed
-using System.Collections.Generic;
+﻿using Easy.Notifications.Persistence.EntityFramework.Entities;
 
 #if !NETFRAMEWORK
 using Microsoft.EntityFrameworkCore;
@@ -62,14 +61,11 @@ namespace Easy.Notifications.Persistence.EntityFramework
                       .IsRequired()
                       .HasMaxLength(255);
 
-                // IMPORTANT: Removed .HasConversion<string>().
-                // We store Enums as INT to ensure compatibility with EF6.
-                // If you strictly need strings ("Email"), you must implement a wrapper property in the Entity for EF6.
                 entity.Property(e => e.Channel).IsRequired();
                 entity.Property(e => e.Priority).IsRequired();
 
                 entity.HasIndex(e => e.CreatedAt);
-                entity.HasIndex(e => e.GroupId); // Good for filtering by Campaign
+                entity.HasIndex(e => e.GroupId);
             });
 #else 
             // --- EF6 CONFIGURATION ---
@@ -84,13 +80,9 @@ namespace Easy.Notifications.Persistence.EntityFramework
                   .IsRequired()
                   .HasMaxLength(255);
 
-            // EF6 automatically maps Enums to INT. 
-            // This matches the EF Core behavior now (since we removed conversion).
             entity.Property(e => e.Channel).IsRequired();
             entity.Property(e => e.Priority).IsRequired();
             
-            // Indexes in EF6 are often handled via Attribute [Index] or Migration logic, 
-            // fluid API support for indexes in EF6 is limited compared to Core.
 #endif
         }
     }

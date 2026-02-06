@@ -20,7 +20,7 @@
         /// </summary>
         public NotificationChannelType ChannelType { get; }
 
-        private Recipient(string value, NotificationChannelType channelType, string displayName)
+        public Recipient(string value, NotificationChannelType channelType, string displayName)
         {
             Value = value;
             ChannelType = channelType;
