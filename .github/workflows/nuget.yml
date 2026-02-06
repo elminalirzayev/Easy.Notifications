@@ -1,8 +1,10 @@
-﻿name: Publish NuGet
+name: Publish NuGet
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
     tags:
       - 'v*.*.*'
 
@@ -18,14 +20,6 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Get Version from Tag
-      id: get_version
-      shell: pwsh
-      run: |
-        $version = "${{ github.ref_name }}".TrimStart('v')
-        Write-Host "Version found: $version"
-        "VERSION=$version" >> $env:GITHUB_OUTPUT
-
     - name: Restore dependencies
       run: dotnet restore
 
@@ -35,8 +29,24 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
-    - name: Pack
-      run: dotnet pack --configuration Release -o out -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} --force
+    - name: Pack All Projects
+      # csproj dosyalarındaki kendi versiyonlarını kullanması için -p:PackageVersion parametresini kaldırdık.
+      # dotnet pack, her projenin kendi .csproj dosyasındaki <Version> etiketini baz alacaktır.
+      run: |
+        dotnet pack --configuration Release `
+        -o out `
+        --no-build `
+        --force
 
-    - name: Push package to NuGet
-      run: dotnet nuget push out\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    - name: Push Packages to NuGet
+      shell: pwsh
+      run: |
+        # out klasöründeki her bir paketi döngü ile gönderir.
+        # --skip-duplicate: Eğer aynı versiyon NuGet'te varsa hata vermez, pas geçer.
+        Get-ChildItem "out\*.nupkg" | ForEach-Object {
+          Write-Host "Attempting to publish: $($_.Name)"
+          dotnet nuget push $_.FullName `
+            --api-key ${{ secrets.NUGET_API_KEY }} `
+            --source https://api.nuget.org/v3/index.json `
+            --skip-duplicate
+        }
