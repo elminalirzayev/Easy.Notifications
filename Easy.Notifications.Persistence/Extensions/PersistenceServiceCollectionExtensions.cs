@@ -1,12 +1,7 @@
 ﻿using Easy.Notifications.Core.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
-using Easy.Notifications.EntityFrameworkCore;
-using Easy.Notifications.EntityFrameworkCore.Implementations;
-
-
-
+using Easy.Notifications.Persistence.EntityFramework.Implementations;
 
 #if !NETFRAMEWORK
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Entity;
 #endif
 
-namespace Easy.Notifications.EntityFrameworkCore.Extensions
+namespace Easy.Notifications.Persistence.EntityFramework.Extensions
 {
     /// <summary>
     /// Extension methods for registering persistence services for Easy.Notifications.

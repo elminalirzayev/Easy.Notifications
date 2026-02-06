@@ -4,60 +4,77 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Easy.Notifications.EntityFrameworkCore;
-
-
 
 #if NETFRAMEWORK
 using System.Data.Entity;
 #else
 using Microsoft.EntityFrameworkCore;
 #endif
-namespace Easy.Notifications.EntityFrameworkCore.Implementations
+
+namespace Easy.Notifications.Persistence.EntityFramework.Implementations
 {
+    /// <summary>
+    /// Provides reporting and statistics data from the notification database.
+    /// </summary>
     public class EfNotificationReportService : INotificationReportService
     {
         private readonly NotificationDbContext _context;
+        private const int MaxRetryThreshold = 3; // "Failed"
 
         public EfNotificationReportService(NotificationDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<DashboardSummaryDto> GetSummaryAsync(DateTime startDate, DateTime endDate)
         {
-            // Performans için sadece ilgili tarih aralığını ve tracking olmadan çekiyoruz
             var query = _context.NotificationLogs
                 .AsNoTracking()
                 .Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
 
-            var total = await query.CountAsync();
-            var success = await query.CountAsync(x => x.IsSuccess);
-            var cancelled = await query.CountAsync(x => x.IsCancelled);
-            // Başarısız ama iptal edilmemiş olanlar
-            var failed = await query.CountAsync(x => !x.IsSuccess && !x.IsCancelled && x.RetryCount >= 3);
-            // Hala denenenler veya kuyrukta olanlar (Basit mantık)
-            var pending = total - (success + failed + cancelled);
-
-            // Kanal Bazlı Kırılım
-            var channels = await query
-                .GroupBy(x => x.Channel)
-                .Select(g => new ChannelStatsDto
+            var aggregateStats = await query
+                .GroupBy(x => 1)
+                .Select(g => new
                 {
-                    Channel = g.Key.ToString(),
+                    Total = g.Count(),
+                    Success = g.Count(x => x.IsSuccess),
+                    Cancelled = g.Count(x => x.IsCancelled),
+                    Failed = g.Count(x => !x.IsSuccess && !x.IsCancelled && x.RetryCount >= MaxRetryThreshold)
+                })
+                .FirstOrDefaultAsync();
+
+            if (aggregateStats == null)
+            {
+                return new DashboardSummaryDto();
+            }
+
+            var pending = aggregateStats.Total - (aggregateStats.Success + aggregateStats.Failed + aggregateStats.Cancelled);
+
+            var channelData = await query
+                .GroupBy(x => x.Channel)
+                .Select(g => new
+                {
+                    ChannelId = g.Key,
                     Count = g.Count(),
-                    SuccessRate = g.Count() > 0 ? (double)g.Count(x => x.IsSuccess) / g.Count() * 100 : 0
+                    SuccessCount = g.Count(x => x.IsSuccess)
                 })
                 .ToListAsync();
 
+            var channelStats = channelData.Select(x => new ChannelStatsDto
+            {
+                Channel = x.ChannelId.ToString(),
+                Count = x.Count,
+                SuccessRate = x.Count > 0 ? (double)x.SuccessCount / x.Count * 100 : 0
+            }).ToList();
+
             return new DashboardSummaryDto
             {
-                TotalRequests = total,
-                Successful = success,
-                Failed = failed,
-                Cancelled = cancelled,
+                TotalRequests = aggregateStats.Total,
+                Successful = aggregateStats.Success,
+                Failed = aggregateStats.Failed,
+                Cancelled = aggregateStats.Cancelled,
                 Pending = pending > 0 ? pending : 0,
-                ChannelBreakdown = channels
+                ChannelBreakdown = channelStats
             };
         }
 
@@ -83,22 +100,33 @@ namespace Easy.Notifications.EntityFrameworkCore.Implementations
 
         public async Task<DashboardSummaryDto> GetGroupStatsAsync(string groupId)
         {
-            if (string.IsNullOrWhiteSpace(groupId)) return new DashboardSummaryDto();
+            if (string.IsNullOrWhiteSpace(groupId))
+                return new DashboardSummaryDto();
 
-            // Aynı mantığı sadece GroupId filtresiyle çalıştırıyoruz
-            var query = _context.NotificationLogs.AsNoTracking().Where(x => x.GroupId == groupId);
+            var query = _context.NotificationLogs
+                .AsNoTracking()
+                .Where(x => x.GroupId == groupId);
 
-            // (Yukarıdaki GetSummaryAsync mantığının aynısı buraya uygulanabilir veya private bir helper metoda çekilebilir)
-            // Örnek kısaltma:
-            var total = await query.CountAsync();
-            var success = await query.CountAsync(x => x.IsSuccess);
+            var stats = await query
+                .GroupBy(x => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Success = g.Count(x => x.IsSuccess),
+                    Failed = g.Count(x => !x.IsSuccess && !x.IsCancelled),
+                    Cancelled = g.Count(x => x.IsCancelled)
+                })
+                .FirstOrDefaultAsync();
+
+            if (stats == null) return new DashboardSummaryDto();
 
             return new DashboardSummaryDto
             {
-                TotalRequests = total,
-                Successful = success,
-                Failed = await query.CountAsync(x => !x.IsSuccess && !x.IsCancelled),
-                Cancelled = await query.CountAsync(x => x.IsCancelled)
+                TotalRequests = stats.Total,
+                Successful = stats.Success,
+                Failed = stats.Failed,
+                Cancelled = stats.Cancelled,
+                Pending = stats.Total - (stats.Success + stats.Failed + stats.Cancelled)
             };
         }
     }
