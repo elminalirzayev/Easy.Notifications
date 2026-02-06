@@ -16,6 +16,5 @@
 		<PackageTags>notification;core;abstractions;interfaces;models;clean-architecture</PackageTags>
 		<PackageReleaseNotes>-</PackageReleaseNotes>
 
-
 	</PropertyGroup>
 </Project>
