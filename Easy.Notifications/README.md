@@ -6,37 +6,31 @@
 [![NuGet](https://img.shields.io/nuget/v/Easy.Notifications.svg)](https://www.nuget.org/packages/Easy.Notifications)
 
 
+# Easy.Notifications
 
-#  Easy.Notifications
+**Easy.Notifications** is a robust, high-performance, and channel-agnostic notification engine for .NET 6+.
 
-**Easy.Notifications** is a high-performance, asynchronous, and channel-agnostic notification library for .NET 6+.
-
-It is designed for **Enterprise** applications that need to send notifications (Email, SMS, Chat, Push) without blocking the main execution thread. It leverages **System.Threading.Channels** to implement a robust "Fire-and-Forget" architecture.
-
+It is designed for enterprise applications that require **Reliable Dispatching** without blocking the main execution thread. It combines **System.Threading.Channels**, **Priority Queues**, and **Hybrid Persistence** to ensure your messages (Email, SMS, Chat) are delivered safely, even under heavy load.
 
 ## 🚀 Features
 
--   ** Asynchronous & Non-Blocking:** Uses high-performance in-memory queues to dispatch messages instantly.
-    
--   ** Multi-Channel Support:** Unified API for:
-    
-    -   **Email:** SMTP, SendGrid, Mailgun.
-        
-    -   **SMS / WhatsApp:** Twilio, Vonage (Nexmo).
-        
-    -   **Chat:** Slack (Block Kit), Microsoft Teams (Message Cards), Telegram.
-        
-    -   **Realtime:** SignalR (WebSockets).
-        
--   ** Rich Content Support:** - Automatically converts messages to **Slack Block Kit** structures.
-    
-    -   Renders **Microsoft Teams Message Cards** with custom colors and sections.
-        
--   ** Modular Architecture:** Add only the providers you need via Dependency Injection.
-    
+-   ** Fire-and-Forget Architecture:** Uses in-memory channels to offload sending logic instantly.
+-   ** Priority Queues:** Process `Urgent` messages (e.g., OTPs, Alerts) before `Normal` newsletters.
+-   ** Resilience & Retries:** Automatic retry mechanism with exponential backoff for failed providers.
+-   ** Hybrid Cancellation:** Cancel millions of pending campaign messages instantly using a Memory+DB hybrid lock.
+-   ** Live Monitoring:** Real-time hooks for SignalR to watch notification traffic as it happens.
+-   ** Audit Logging:** (Optional) Persist every attempt, success, and failure to SQL Server using the persistence package.
 -   ** Built-in Templating:** Lightweight template engine for dynamic content (`Hello {{Name}}`).
-    
-
+-   ** Modular Architecture:** Add only the providers you need via Dependency Injection.
+-   ** Multi-Channel Support:**
+    -   **Email:** SMTP, SendGrid, Mailgun.
+    -   **SMS/WhatsApp:** Twilio, Vonage.
+    -   **Chat:** Slack (Block Kit), Teams (Adaptive Cards), Telegram.
+    -   **Realtime:** SignalR (WebSockets).
+-   ** Rich Content Support:**
+    -   Automatically converts messages to **Slack Block Kit** structures.
+    -   Renders **Microsoft Teams Message Cards** with custom colors and sections.   
+      
 ##  Architecture
 
 The library separates the **Dispatching** logic from the **Processing** logic to ensure maximum throughput.
@@ -48,8 +42,7 @@ The library separates the **Dispatching** logic from the **Processing** logic to
 3.  **Worker:** A background service (`BackgroundNotificationWorker`) reads from the channel.
     
 4.  **Provider:** The specific provider (e.g., `SlackProvider`, `SmtpEmailProvider`) executes the external API call safely.
-    
-
+  
 
 ## Installation
 
@@ -65,16 +58,68 @@ Or via .NET CLI:
 dotnet add package Easy.Notifications
 ```
 
+_(Optional) If you need database logging and retry persistence:_
 
-##  Configuration
+```bash
+dotnet add package Easy.Notifications.Persistence.EntityFramework
+```
 
-### 1. appsettings.json
+## Configuration
 
-Configure only the providers you intend to use.
+### 1. Register Services (Program.cs)
+
+Use the fluent API to configure exactly what you need.
+
+
+```csharp
+using Easy.Notifications.Extensions;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Add Core Services (Dispatcher, Worker)
+builder.Services.AddEasyNotifications();
+
+// 2. Add Desired Providers (Modular Registration)
+// Email
+builder.Services.AddSmtpEmail(builder.Configuration);
+// builder.Services.AddSendGrid(builder.Configuration);
+// builder.Services.AddMailgun(builder.Configuration);
+
+// 3. SMS & WhatsApp
+builder.Services.AddTwilio(builder.Configuration);
+// builder.Services.AddVonage(builder.Configuration);
+
+// 4. Chat Apps (Slack, Teams, Telegram)
+builder.Services.AddChatProviders(builder.Configuration);
+
+// 5. (Optional) Add Persistence for Logs & Retries
+var connString = builder.Configuration.GetConnectionString("NotificationDb");
+builder.Services.AddNotificationPersistence(options => options.UseSqlServer(connString));
+
+// 6. Realtime
+builder.Services.AddSignalRNotifications();
+
+// 7. (Optional) Add Real-Time Monitoring
+builder.Services.AddSingleton<INotificationLiveMonitor, SignalRNotificationMonitor>();
+
+var app = builder.Build();
+
+// Map SignalR Hub (If using Realtime)
+app.MapHub<NotificationHub>("/notifications");
+
+app.Run();
+
+```
+
+### 2. Configure Settings (appsettings.json)
 
 ```json
 {
   "NotificationConfiguration": {
+    "RetryConfiguration": {
+      "MaxRetryCount": 5,
+      "IntervalInMinutes": 10
+    },
     "EmailConfiguration": {
       "Host": "smtp.example.com",
       "Port": 587,
@@ -113,97 +158,95 @@ Configure only the providers you intend to use.
 }
 ```
 
-### 2. Service Registration (Program.cs)
-
-Register the core services and the specific providers you need.
-
-```csharp
-using Easy.Notifications.Extensions;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// 1. Add Core Services (Dispatcher, Worker)
-builder.Services.AddEasyNotifications();
-
-// 2. Add Desired Providers (Modular Registration)
-// Email
-builder.Services.AddSmtpEmail(builder.Configuration);
-// builder.Services.AddSendGrid(builder.Configuration);
-// builder.Services.AddMailgun(builder.Configuration);
-
-// SMS & WhatsApp
-builder.Services.AddTwilio(builder.Configuration);
-// builder.Services.AddVonage(builder.Configuration);
-
-// Chat Apps (Slack, Teams, Telegram)
-builder.Services.AddChatProviders(builder.Configuration);
-
-// Realtime
-builder.Services.AddSignalRNotifications();
-
-
-var app = builder.Build();
-
-// 3. Map SignalR Hub (If using Realtime)
-app.MapHub<NotificationHub>("/notifications");
-
-app.Run();
-```
 
 ## Usage
 
-Inject `INotificationService` into your controllers or business services.
+Inject `INotificationService` into your controllers.
 
-### Example 1: Sending Rich Slack & Teams Messages
+### 1. Sending an Urgent Alert (Priority Queue)
 
-Send structured messages with colors, headers, and metadata without dealing with complex JSON payloads.
+Urgent messages jump to the front of the line.
 
 ```csharp
-public class AlertController : ControllerBase
+[HttpPost("send-otp")]
+public async Task<IActionResult> SendOtp()
 {
-    private readonly INotificationService _notifier;
-
-    public AlertController(INotificationService notifier)
+    var payload = new NotificationPayload
     {
-        _notifier = notifier;
+        Subject = "Login Code",
+        Body = "Your code is: **123456**",
+        Priority = NotificationPriority.Urgent, // Processed immediately
+        Recipients = new List<Recipient> 
+        { 
+            Recipient.Sms("+15550001234"),
+            Recipient.WhatsApp("+15550001234")
+        }
+    };
+
+    await _notifier.SendAsync(payload);
+    return Ok();
+}
+```
+
+### 2. Sending Rich Chat Messages (Context Aware)
+
+Send styled messages to Slack and Teams using the same payload.
+
+```csharp
+var payload = new NotificationPayload
+{
+    Subject = "⚠️ Server High Load",
+    Body = "Server **PROD-01** is at 99% CPU.",
+    Metadata = new Dictionary<string, object>
+    {
+        { "ThemeColor", "FF0000" }, // Red card for Teams
+        { "Server", "Prod-01" },    // Field for Slack
+        { "Region", "US-East" }
+    },
+    Recipients = new List<Recipient>
+    {
+        Recipient.Teams("https://outlook.office.com/webhook/..."),
+        Recipient.Slack("https://hooks.slack.com/services/...")
     }
+};
 
-    [HttpPost("alert")]
-    public async Task<IActionResult> SendAlert()
+await _notifier.SendAsync(payload);
+```
+
+### 3. Campaign Management (Grouping & Cancellation)
+
+You can group notifications (e.g., a newsletter) and cancel them instantly if you realize there is a typo.
+
+**Sending:**
+
+```csharp
+var payload = new NotificationPayload
+{
+    GroupId = "Newsletter-Feb-2026", // Link messages to a group
+    Subject = "Monthly Update",
+    Recipients = // list of 10,000 users...
+};
+await _notifier.SendAsync(payload);
+```
+
+**Cancelling:**
+
+```csharp
+public class AdminController : ControllerBase
+{
+    private readonly INotificationCancellationManager _cancellationManager;
+
+    [HttpPost("cancel-campaign")]
+    public async Task<IActionResult> Cancel(string campaignId)
     {
-        var slackUrl = "https://hooks.slack.com/services/T000/B000/XXXX";
-        var teamsUrl = "https://your-teams-webhook-url";
-
-        var payload = new NotificationPayload
-        {
-            Subject = "High CPU Usage Warning 🚨",
-            Body = "Server **Prod-01** CPU usage is at *98%*. Please investigate immediately.",
-            
-            Recipients = new List<Recipient>
-            {
-                Recipient.Chat(slackUrl, NotificationChannelType.Slack),
-                Recipient.Chat(teamsUrl, NotificationChannelType.Teams)
-            },
-
-            // Metadata creates "Context" in Slack and "Fact Section" in Teams
-            Metadata = new Dictionary<string, object>
-            {
-                { "ThemeColor", "FF0000" }, // Red card for Teams
-                { "Server", "Linux-Prod-01" },
-                { "Region", "US-East-1" },
-                { "Time", DateTime.Now.ToString("HH:mm") }
-            }
-        };
-
-        // Fire-and-Forget
-        await _notifier.SendAsync(payload);
-
-        return Ok("Alert queued.");
+        // Instantly stops processing this group in memory and DB
+        await _cancellationManager.CancelGroupAsync(campaignId, TimeSpan.FromHours(24));
+        return Ok("Campaign stopped.");
     }
 }
 ```
 
-### Example 2: Multi-Channel Broadcast (Email + SMS)
+### 4. Multi-Channel Broadcast (Email + SMS)
 
 ```csharp
 var payload = new NotificationPayload
@@ -223,7 +266,7 @@ var payload = new NotificationPayload
 await _notifier.SendAsync(payload);
 ```
 
-### Example 3: Real-Time Web Notification (SignalR)
+### 5. Real-Time Web Notification (SignalR)
 
 ```csharp
 var payload = new NotificationPayload
@@ -238,6 +281,19 @@ var payload = new NotificationPayload
 
 await _notifier.SendAsync(payload);
 ```
+
+## Live Dashboard & Monitoring
+
+The library supports real-time monitoring via SignalR. When enabled, the worker broadcasts every event (Success/Failure) to your frontend.
+
+1.  Implement `INotificationLiveMonitor` in your Web API.
+    
+2.  Register it as a Singleton.
+    
+3.  Connect your React/Angular frontend to the SignalR Hub.
+    
+
+_(See the `samples` folder for a full dashboard implementation)_
 
 ##  Supported Providers
 
@@ -256,18 +312,13 @@ await _notifier.SendAsync(payload);
 | **Realtime** | `SignalRProvider`        | `Microsoft.AspNetCore.SignalR.Core` | Pushes to connected clients |
 
 
-##  Extending
+## The Ecosystem
 
-You can easily add your own provider (e.g., Discord, Firebase FCM) by implementing `INotificationProvider`.
-
-1.  Create a class implementing `INotificationProvider`.
-    
-2.  Define the `SupportedChannel`.
-    
-3.  Implement `SendAsync`.
-    
-4.  Register it in DI: `services.TryAddEnumerable(ServiceDescriptor.Singleton<INotificationProvider, MyCustomProvider>());`
-    
+| Package | Description |
+| --- | --- |
+| **`Easy.Notifications.Core`** | Abstractions, Interfaces, and Models. |
+| **`Easy.Notifications`** | **(You are here)** The main engine and default providers. |
+| **`Easy.Notifications.Persistence.EntityFramework`** | Persistence layer for logging, status tracking, and retry mechanisms. |
 
 ___
 
@@ -290,6 +341,3 @@ This project is licensed under the MIT License.
 ---
 
 © 2025 Elmin Alirzayev / Easy Code Tools
-
-
-

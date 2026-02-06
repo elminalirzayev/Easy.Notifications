@@ -1,3 +1,11 @@
+[![Build & Test](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/build.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/build.yml)
+[![Build & Release](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/release.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/release.yml)
+[![Build & Nuget Publish](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/nuget.yml/badge.svg)](https://github.com/elminalirzayev/Easy.Notifications/actions/workflows/nuget.yml)
+[![Release](https://img.shields.io/github/v/release/elminalirzayev/Easy.Notifications)](https://github.com/elminalirzayev/Easy.Notifications/releases)
+[![License](https://img.shields.io/github/license/elminalirzayev/Easy.Notifications)](https://github.com/elminalirzayev/Easy.Notifications/blob/master/LICENSE.txt)
+[![NuGet](https://img.shields.io/nuget/v/Easy.Notifications.svg)](https://www.nuget.org/packages/Easy.Notifications)
+
+
 # Easy.Notifications.Core
 
 **The abstraction layer and shared models for the Easy Notification System.**
@@ -22,18 +30,23 @@ dotnet add package Easy.Notifications.Core
 
 ## Key Features
 
--   **Unified Payload:** A single `NotificationPayload` model to rule them all (Email, SMS, Chat).
-    
--   **Rich Recipient Model:** Helper methods for creating Email, SMS, Teams, Slack, and Telegram recipients.
-    
+-   **Unified Payload:** A single `NotificationPayload` model to rule them all (Email, SMS, Chat). 
+-   **Rich Recipient Model:** Helper methods for creating Email, SMS, Teams, Slack, and Telegram recipients. 
 -   **Prioritization:** Built-in `NotificationPriority` enum (Urgent, High, Normal, Low).
-    
 -   **Templating Support:** Dictionary-based template data structure.
-    
 -   **Metadata Support:** Pass custom data (e.g., color codes for Teams cards) via Metadata.
-    
 -   **Clean Architecture:** Pure C# POCOs and Interfaces. Zero external dependencies.
     
+
+### Supported Channels (Enum)
+The `NotificationChannelType` enum currently supports:
+* `Email` (SMTP, SendGrid, Mailgun)
+* `Sms` (Twilio, Vonage)
+* `Teams` (Webhook)
+* `Slack` (Webhook)
+* `Telegram` (Bot API)
+* `WhatsApp` (Twilio/Vonage)
+
 
 ## Usage
 
@@ -96,6 +109,9 @@ public class MyCustomProvider : INotificationProvider
 }
 ```
 
+> **Developer Note:** In your application, you will inject `INotificationService` (provided by the main `Easy.Notifications` package) and use it to dispatch the payload you create here.
+
+
 ## The Ecosystem
 
 This package is part of a modular notification system:
@@ -105,7 +121,7 @@ This package is part of a modular notification system:
 | **`Easy.Notifications.Core`** | **(You are here)** Abstractions, Interfaces, and Models. |
 | **`Easy.Notifications`** | The main engine. Includes Background Worker, Retry logic, Dispatcher, and default providers (SMTP, Twilio, etc.). |
 | **`Easy.Notifications.EntityFrameworkCore`** | Persistence layer for logging, status tracking, and retry mechanisms using EF Core. |
-
+| **`Easy.Notifications.EntityFrameworkCore`** | Persistence layer for logging, status tracking, and retry mechanisms using EF Core. |
 
 ___
 
