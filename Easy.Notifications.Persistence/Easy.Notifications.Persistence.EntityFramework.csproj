@@ -7,7 +7,7 @@
 		<AssemblyTitle>Easy.Notifications.Persistence.EntityFramework</AssemblyTitle>
 		<AssemblyName>Easy.Notifications.Persistence.EntityFramework</AssemblyName>
 		<PackageId>Easy.Notifications.Persistence.EntityFramework</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Description>
 			Entity Framework and Entity Framework Core storage implementation for Easy.Notifications.
 			Provides database logging, status tracking, and persistence for retry mechanisms.

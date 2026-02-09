@@ -1,4 +1,7 @@
-﻿using Easy.Notifications.Persistence.EntityFramework.Entities;
+﻿using Easy.Notifications.Core.Models;
+using Easy.Notifications.Persistence.EntityFramework.Entities;
+using System;
+using System.Linq;
 
 #if !NETFRAMEWORK
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +43,16 @@ namespace Easy.Notifications.Persistence.EntityFramework
         public DbSet<NotificationLog> NotificationLogs { get; set; } = null!;
 
         /// <summary>
+        /// Gets or sets the channel type lookup table.
+        /// </summary>
+        public DbSet<ChannelTypeLookup> ChannelTypes { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the priority type lookup table.
+        /// </summary>
+        public DbSet<PriorityTypeLookup> PriorityTypes { get; set; } = null!;
+
+        /// <summary>
         /// Configures the database schema and model mappings for both EF versions.
         /// </summary>
 #if !NETFRAMEWORK
@@ -51,6 +64,18 @@ namespace Easy.Notifications.Persistence.EntityFramework
 #if !NETFRAMEWORK
             // --- EF CORE CONFIGURATION ---
             base.OnModelCreating(modelBuilder);
+
+            var channels = Enum.GetValues(typeof(NotificationChannelType))
+                .Cast<NotificationChannelType>()
+                .Select(e => new ChannelTypeLookup { Id = e, Name = e.ToString() });
+
+            modelBuilder.Entity<ChannelTypeLookup>().HasData(channels);
+
+            var priorities = Enum.GetValues(typeof(NotificationPriority))
+                .Cast<NotificationPriority>()
+                .Select(e => new PriorityTypeLookup { Id = e, Name = e.ToString() });
+
+            modelBuilder.Entity<PriorityTypeLookup>().HasData(priorities);
 
             modelBuilder.Entity<NotificationLog>(entity =>
             {
@@ -71,6 +96,9 @@ namespace Easy.Notifications.Persistence.EntityFramework
             // --- EF6 CONFIGURATION ---
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ChannelTypeLookup>().ToTable("ChannelTypes");
+            modelBuilder.Entity<PriorityTypeLookup>().ToTable("PriorityTypes");
+
             var entity = modelBuilder.Entity<NotificationLog>();
             
             entity.ToTable("NotificationLogs");
@@ -81,8 +109,13 @@ namespace Easy.Notifications.Persistence.EntityFramework
                   .HasMaxLength(255);
 
             entity.Property(e => e.Channel).IsRequired();
-            entity.Property(e => e.Priority).IsRequired();
-            
+            entity.Property(e => e.Priority).IsRequired();           
+
+            entity.HasIndex(e => e.CreatedAt);
+            entity.HasIndex(e => e.GroupId);
+
+            // Note: EF6 Seeding is typically handled in Migrations/Configuration.cs 
+            // using the Seed() method since HasData() is not available here.
 #endif
         }
     }

@@ -37,7 +37,7 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
                     Cancelled = g.Count(x => x.IsCancelled),
                     Failed = g.Count(x => !x.IsSuccess && !x.IsCancelled && x.RetryCount >= MaxRetryThreshold)
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (aggregateStats == null)
             {
@@ -47,18 +47,19 @@ namespace Easy.Notifications.Persistence.EntityFramework.Implementations
             var pending = aggregateStats.Total - (aggregateStats.Success + aggregateStats.Failed + aggregateStats.Cancelled);
 
             var channelData = await query
-                .GroupBy(x => x.Channel)
+                .Where(x => x.ChannelLookup != null)
+                .GroupBy(x => x.ChannelLookup!.Name)
                 .Select(g => new
                 {
-                    ChannelId = g.Key,
+                    Channel = g.Key ?? "Unknown",
                     Count = g.Count(),
                     SuccessCount = g.Count(x => x.IsSuccess)
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var channelStats = channelData.Select(x => new ChannelStatsDto
             {
-                Channel = x.ChannelId.ToString(),
+                Channel = x.Channel,
                 Count = x.Count,
                 SuccessRate = x.Count > 0 ? (double)x.SuccessCount / x.Count * 100 : 0
             }).ToList();
