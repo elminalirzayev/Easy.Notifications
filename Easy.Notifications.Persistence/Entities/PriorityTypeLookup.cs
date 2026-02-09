@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Easy.Notifications.Persistence.EntityFramework.Entities
 {
-    
     [Table("PriorityTypes")]
     public class PriorityTypeLookup
     {
